@@ -1,20 +1,14 @@
 import os
 from db_configuration import db_connection_mongo, db_connection_sql_server
 import datetime
+from db_security import encrypt_data
 
-def convert_db_sql_server_to_mongodb():
-    data_tables = {}
+def process_data_sql_server():
     sql_conn = db_connection_sql_server(
         os.getenv("DB_DRIVER"),
         os.getenv("DB_SERVER"),
         os.getenv("DB_DATABASE")
     )
-
-    mongo_client = db_connection_mongo(os.getenv("DB_URL_MONGO"))
-
-    if not sql_conn or not mongo_client:
-        print("Erro: não foi possível conectar ao banco de dados.")
-        return
 
     cursor = sql_conn.cursor()
     name_tables = cursor.execute(f"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'")
@@ -25,17 +19,22 @@ def convert_db_sql_server_to_mongodb():
 
         columns = [table_name[0] for table_name in cursor.description]
         rows = data_tables.fetchall()
-        print(rows)
 
         bson = [
             {col: (datetime.datetime(val.year, val.month, val.day) if isinstance(val, datetime.date) and not isinstance(
                 val, datetime.datetime) else val)
-             for col, val in zip(columns, row)}
+            for col, val in zip(columns, row)}
             for row in rows
         ]
 
-        db = mongo_client["api6bd"]
-        collection = db[table_name]
+    return bson
 
-        if bson:
-            collection.insert_many(bson)
+def save_on_mongo_db(bson_encrypted, table_name):
+    mongo_client = db_connection_mongo(
+        os.getenv("DB_URL_MONGO")
+    )
+    db = mongo_client[os.getenv("DB_MONGO")]
+    name_collection = db[table_name]
+
+    if bson_encrypted:
+        name_collection.insert_many(bson_encrypted)
