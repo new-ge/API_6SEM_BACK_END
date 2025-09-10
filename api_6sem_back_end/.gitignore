@@ -1,7 +1,9 @@
-.env
-.env.local
-.env.development
-.env.production
-.env.test
+*.env
+*.env.local
+*.env.development
+*.env.production
+*.env.test
 
 .vscode/
+
+.idea/

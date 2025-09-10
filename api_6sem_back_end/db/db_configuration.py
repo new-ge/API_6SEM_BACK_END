@@ -7,7 +7,7 @@ from pymongo import MongoClient
 dotenv_path = glob.glob(os.path.join(os.path.dirname(__file__), "*.env"))
 load_dotenv(dotenv_path[0])
 
-def db_connection_sql_server(url_driver, server, db_name):
+def db_connection_sql_server(url_driver: str, server: str, db_name: str):
     conn_str = (
         f"DRIVER={{{url_driver}}};"
         f"SERVER={server};"
@@ -27,6 +27,7 @@ def db_connection_mongo(url_mongo: str):
 
     try:
         client = MongoClient(uri)
+        print(client)
         print("Conexão bem-sucedida!")
         return client
     except Exception as e:
