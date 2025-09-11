@@ -27,7 +27,6 @@ def db_connection_mongo(url_mongo: str):
 
     try:
         client = MongoClient(uri)
-        print(client)
         print("Conexão bem-sucedida!")
         return client
     except Exception as e:

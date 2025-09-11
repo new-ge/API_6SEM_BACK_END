@@ -1,0 +1,1 @@
+collections_to_create = ["Users", "Tickets", "AuditLogs"]

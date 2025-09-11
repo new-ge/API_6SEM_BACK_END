@@ -4,6 +4,8 @@ import os
 fernet = Fernet(os.getenv("KEY"))
 
 def encrypt_data(data: str):
+    if not isinstance(data, str):
+        data = str(data)
     return fernet.encrypt(data.encode()).decode()
 
 def decrypt_data(token: str):
