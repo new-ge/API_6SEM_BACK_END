@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from api_6sem_back_end.db import collection  # agora vem do módulo separado
+from api_6sem_back_end.db import collection
 from datetime import datetime
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
