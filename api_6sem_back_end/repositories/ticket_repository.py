@@ -1,7 +1,5 @@
-#from app.database.mongo import db
-#Import da conexão com o banco ajustar posteriormente
-
-collection = db["Collectiion name"]  #
+#from api_6sem_back_end.db.mongodb import db
+collection = db["Collection name"] #provisório mudar para o certo depois
 
 class TicketRepository:
     @staticmethod

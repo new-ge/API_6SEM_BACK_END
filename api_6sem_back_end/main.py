@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from controllers.ticket_controller import router 
+from api_6sem_back_end.router.ticket_router import router 
 
 app = FastAPI()
 

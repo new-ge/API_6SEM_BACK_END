@@ -1,6 +1,6 @@
 from datetime import datetime
 from collections import defaultdict
-from repositories.ticket_repository import TicketRepository
+from api_6sem_back_end.repositories.ticket_repository import TicketRepository
 
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S.%f0"
 
