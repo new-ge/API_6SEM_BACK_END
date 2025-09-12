@@ -1,5 +1,5 @@
 sensitive_fields = {
     "Agents": ["FullName", "Email"],
-    "AuditLogs": ["PerformedBy"],
+    "AuditLogs": ["PerformedBy", "PerformedAt"],
     "Tickets": ["Title", "Description", "CreatedAt", "ClosedAt"]
 }

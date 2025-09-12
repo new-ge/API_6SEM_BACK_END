@@ -4,8 +4,8 @@ import pyodbc
 import glob
 from pymongo import MongoClient
 
-dotenv_path = glob.glob(os.path.join(os.path.dirname(__file__), "*.env"))
-load_dotenv(dotenv_path[0])
+# dotenv_path = glob.glob(os.path.join(os.path.dirname(__file__), "*.env"))
+# load_dotenv(dotenv_path[0])
 
 def db_connection_sql_server(url_driver: str, server: str, db_name: str):
     conn_str = (
@@ -24,9 +24,16 @@ def db_connection_sql_server(url_driver: str, server: str, db_name: str):
 
 def db_connection_mongo(url_mongo: str):
     uri = url_mongo
+    print(uri)
 
     try:
-        client = MongoClient(uri)
+        client = MongoClient(
+            uri,
+            serverSelectionTimeoutMS=999999999,
+            connectTimeoutMS=None,
+            socketTimeoutMS=None,
+            tls=True
+        )
         print("Conexão bem-sucedida!")
         return client
     except Exception as e:

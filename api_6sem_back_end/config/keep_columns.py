@@ -1,14 +1,14 @@
 columns_to_keep = {
     "Agents": ["AgentId", "FullName", "Email", "IsActive", "DepartmentId"],
-    "AuditLogs": ["Operation", "PerformedBy", "DetailsJson"],
+    "AuditLogs": ["Operation", "PerformedBy", "DetailsJson", "PerformedAt"],
     "Categories": ["CategoryId", "Name"],
     "Departments": ["DepartmentId", "Name"],
     "Priorities": ["PriorityId", "Name"],
     "Products": ["ProductId", "Name"],
-    "SLA_Plans": ["Name", "FirstResponseMins", "ResolutionMins"],
+    "SLA_Plans": ["Name", "ResolutionMins", "SLAPlanId"],
     "Statuses": ["StatusId", "Name"],
     "Subcategories": ["SubcategoryId", "Name"],
     "Tags": ["Name"],
-    "TicketStatusHistory": ["FromStatusId", "ToStatusId"],
-    "Tickets": ["Title", "Description", "CreatedAt", "ClosedAt"]
+    "TicketStatusHistory": ["TicketId", "FromStatusId", "ToStatusId"],
+    "Tickets": ["TicketId", "Title", "Description", "CreatedAt", "ClosedAt", "CurrentStatusId", "ProductId", "PriorityId", "CategoryId", "SLAPlanId", "SubcategoryId"]
 }
