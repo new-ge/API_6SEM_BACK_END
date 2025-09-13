@@ -82,9 +82,17 @@ def create_collections_mongo_db(all_tables):
     product_lookup = {d["ProductId"]: d["Name"] for d in all_tables["Products"]}
     category_lookup = {d["CategoryId"]: d["Name"] for d in all_tables["Categories"]}
     sub_category_lookup = {d["SubcategoryId"]: d["Name"] for d in all_tables["Subcategories"]}
+    tag_lookup = {t["TagId"]: t["Name"] for t in all_tables["Tags"]}
+
+    tags_by_ticket = {}
+    for tt in all_tables["TicketTags"]:
+        ticket_id = tt.get("TicketId")
+        tag_id = tt.get("TagId")
+        if ticket_id not in tags_by_ticket:
+            tags_by_ticket[ticket_id] = []
+        tags_by_ticket[ticket_id].append(tag_lookup.get(tag_id))
 
     history_by_ticket = {}
-
     for h in all_tables["TicketStatusHistory"]:
         if h.get("TicketId") not in history_by_ticket:
             history_by_ticket[h.get("TicketId")] = []
@@ -120,7 +128,10 @@ def create_collections_mongo_db(all_tables):
             "product": product_lookup.get(ticket.get("ProductId")),
             "category": category_lookup.get(ticket.get("CategoryId")),
             "sub_category": sub_category_lookup.get(ticket.get("SubcategoryId")),
-            "history": history_by_ticket.get(ticket["TicketId"], [])
+            "tag": tags_by_ticket.get(ticket["TicketId"], []),
+            "history": history_by_ticket.get(ticket["TicketId"], []),
+            "created_at": ticket["CreatedAt"],
+            "closed_at": ticket["ClosedAt"],
         }
         tickets_docs.append(ticket_collection)
 
