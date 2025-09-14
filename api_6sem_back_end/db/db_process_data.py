@@ -6,10 +6,6 @@ from pymongo.errors import BulkWriteError, DuplicateKeyError
 import json
 from bson import ObjectId
 
-users_docs = []
-tickets_docs = []
-history_docs = []
-
 def process_data_sql_server(columns_to_keep):
     sql_conn = db_connection_sql_server(
         os.getenv("DB_DRIVER"),
@@ -101,8 +97,11 @@ def create_collections_mongo_db(all_tables):
             "to": status_lookup.get(h.get("ToStatusId")),
         })
 
+    users_docs, tickets_docs, history_docs = [], [], []
+
     for agent in all_tables["Agents"]:
         user_collection = {
+            "agent_id": agent["AgentId"],
             "name": agent["FullName"],
             "email": agent["Email"],
             "department": department_lookup.get(agent.get("DepartmentId")),
@@ -117,6 +116,7 @@ def create_collections_mongo_db(all_tables):
 
     for ticket in all_tables["Tickets"]:
         ticket_collection = {
+            "ticket_id": ticket["TicketId"],
             "title": ticket["Title"],
             "description": ticket["Description"],
             "status": status_lookup.get(ticket.get("StatusId") or ticket.get("CurrentStatusId")),
@@ -137,6 +137,7 @@ def create_collections_mongo_db(all_tables):
 
     for history in all_tables["AuditLogs"]:
         history_collection = {
+            "audit_id": history["AuditId"],
             "name": history["PerformedBy"],
             "operation": history["Operation"],
             "performed_at": history["PerformedAt"],
@@ -147,9 +148,7 @@ def create_collections_mongo_db(all_tables):
     return history_docs, tickets_docs, users_docs
 
 def save_on_mongo_db(**collections_docs):
-    mongo_client = db_connection_mongo(
-        os.getenv("DB_URL_MONGO")
-    )
+    mongo_client = db_connection_mongo(os.getenv("DB_URL_MONGO"))
     db = mongo_client[os.getenv("DB_MONGO")]
 
     for collection_name, docs in collections_docs.items():
@@ -157,16 +156,20 @@ def save_on_mongo_db(**collections_docs):
             continue
 
         for doc in docs:
-            if "_id" not in doc:
-                if doc.get("id") or doc.get("TicketId"):
-                    doc["_id"] = ObjectId(str(doc.get("id") or doc.get("TicketId")))
-                else:
-                    doc["_id"] = ObjectId()
+            if doc.get("agent_id"):
+                filter_query = {"agent_id": doc["agent_id"]}
+            elif doc.get("audit_id"):
+                filter_query = {"audit_id": doc["audit_id"]}
+            elif doc.get("ticket_id"):
+                filter_query = {"ticket_id": doc["ticket_id"]}
+            else:
+                continue
+
             try:
                 db[collection_name].update_one(
-                    {"_id": doc["_id"]},
+                    filter_query,
                     {"$set": doc},
                     upsert=True
                 )
-            except (DuplicateKeyError, BulkWriteError):
-                pass
+            except (DuplicateKeyError, BulkWriteError) as e:
+                print(f"Erro ao salvar: {e}")
