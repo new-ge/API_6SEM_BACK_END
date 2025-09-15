@@ -1,5 +1,11 @@
 import pyodbc
 from pymongo import MongoClient
+import os
+from dotenv import load_dotenv
+import glob
+
+dotenv_path = glob.glob(os.path.join(os.path.dirname(__file__), "*.env"))
+load_dotenv(dotenv_path[0])
 
 def db_connection_sql_server(url_driver: str, server: str, db_name: str):
     conn_str = (
@@ -28,7 +34,10 @@ def db_connection_mongo(url_mongo: str):
             tls=True
         )
         print("Conexão bem-sucedida!")
-        return client
+        db = client[os.getenv("DB_MONGO")]
+        return db
     except Exception as e:
         print("Erro na conexão:", e)
         return None
+
+db = db_connection_mongo(os.getenv("DB_URL_MONGO"))

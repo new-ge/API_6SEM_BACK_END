@@ -1,1 +1,1 @@
-collections_to_create = ["Users", "Tickets", "AuditLogs"]
+collections = ["ticket", "history", "users"]

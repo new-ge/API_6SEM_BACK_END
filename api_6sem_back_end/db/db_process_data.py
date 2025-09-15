@@ -4,7 +4,6 @@ import datetime
 from api_6sem_back_end.db.db_security import encrypt_data
 from pymongo.errors import BulkWriteError, DuplicateKeyError
 import json
-from bson import ObjectId
 
 def process_data_sql_server(columns_to_keep):
     sql_conn = db_connection_sql_server(
@@ -48,7 +47,7 @@ def process_data_sql_server(columns_to_keep):
         else:
             pass
 
-    return all_tables, name_tables
+    return all_tables
 
 def encrypt_sensitive_fields_bson(all_tables, sensitive_fields):
     for table_name, rows in all_tables.items():
@@ -148,8 +147,7 @@ def create_collections_mongo_db(all_tables):
     return history_docs, tickets_docs, users_docs
 
 def save_on_mongo_db(**collections_docs):
-    mongo_client = db_connection_mongo(os.getenv("DB_URL_MONGO"))
-    db = mongo_client[os.getenv("DB_MONGO")]
+    db = db_connection_mongo(os.getenv("DB_URL_MONGO"))
 
     for collection_name, docs in collections_docs.items():
         if not docs:
