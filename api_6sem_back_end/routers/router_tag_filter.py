@@ -25,6 +25,7 @@ async def teste_docs():
     async for doc in cursor:
         docs.append(doc)
     return docs
+
 @router.get("/inserir-teste")
 async def inserir_teste():
     ticket = {
