@@ -1,12 +1,11 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
+import os
 
-client = AsyncIOMotorClient(
-    "mongodb+srv://luminia:McdvG8uWGdMX14bZ@bd6sem-luminia.yllfoxm.mongodb.net/?retryWrites=true&w=majority&appName=bd6sem-luminia",
-    tlsAllowInvalidCertificates=True
-)
+load_dotenv()
+
+MONGO_URI = os.getenv("DB_URL_MONGO")
+
+client = AsyncIOMotorClient(MONGO_URI)
 db = client["bd6sem-luminia"]
-collection = db["tikets"]
-
-
-load_dotenv()  # Isso carrega as variáveis do .env automaticamente
+collection = db["tickets"]
