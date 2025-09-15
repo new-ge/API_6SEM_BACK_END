@@ -5,7 +5,7 @@ from api_6sem_back_end.models.ticket import TicketPeriod
 
 router = APIRouter(prefix="/chamados", tags=["chamados"])
 
-@router.post("/por-periodo", response_model=Dict[str, Any])
+@router.get("/por-periodo", response_model=Dict[str, Any])
 def count_tickets(request: TicketPeriod):
     return TicketService.count_tickets_by_period(
         start_date=request.start_date,
