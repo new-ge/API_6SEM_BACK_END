@@ -7,4 +7,6 @@
 .vscode/
 
 .idea/
+
+*.pyc
 __pycache__/

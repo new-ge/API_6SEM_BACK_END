@@ -1,10 +1,9 @@
 from fastapi import APIRouter
 from api_6sem_back_end.db.db_configuration import db
-from api_6sem_back_end.db.db_security import decrypt_data
-from datetime import datetime
 
 router = APIRouter(prefix="/tickets", tags=["tickets"])
 collection = db["tickets"]
+collection.create_index("closed_at")
 
 @router.get("/opened/count")
 def count_opened_tickets():

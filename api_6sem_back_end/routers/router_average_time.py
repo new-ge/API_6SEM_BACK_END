@@ -31,8 +31,6 @@ def average_time_closed_tickets():
         }
     ]
 
-    print(pipeline)
-
     result = list(collection.aggregate(pipeline))
 
     if not result:
