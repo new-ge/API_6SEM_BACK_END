@@ -1,0 +1,1 @@
+collections = ["tickets", "history", "users"]
