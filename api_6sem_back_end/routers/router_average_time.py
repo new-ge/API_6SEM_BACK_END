@@ -1,23 +1,24 @@
 from fastapi import APIRouter
-from api_6sem_back_end.db import collection
-from datetime import datetime
+from api_6sem_back_end.db.db_configuration import db
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 
-@router.get("/closed/average-time")
-async def average_time_closed_tickets():
+collection = db["tickets"]
+collection.create_index("closed_at")
 
+@router.get("/closed/average-time")
+def average_time_closed_tickets():
     pipeline = [
-        {"$match": {"ClosedAt": {"$ne": None}}},
+        {"$match": {"closed_at": {"$ne": None}}},
         {
             "$project": {
                 "diffInSeconds": {
                     "$divide": [
                         {"$subtract": [
-                            {"$toDate": "$ClosedAt"},
-                            {"$toDate": "$CreatedAt"}
+                            "$closed_at",
+                            "$created_at"
                         ]},
-                        1000  
+                        1000
                     ]
                 }
             }
@@ -30,7 +31,9 @@ async def average_time_closed_tickets():
         }
     ]
 
-    result = await collection.aggregate(pipeline).to_list(length=1)
+    print(pipeline)
+
+    result = list(collection.aggregate(pipeline))
 
     if not result:
         return {"average_duration_minutes": 0}

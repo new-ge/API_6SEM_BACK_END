@@ -1,5 +1,6 @@
-#from api_6sem_back_end.db.mongodb import db
-collection = db["Collection name"] #provisório mudar para o certo depois
+from api_6sem_back_end.db.db_configuration import db
+
+collection = db["tickets"]
 
 class TicketRepository:
     @staticmethod
