@@ -14,8 +14,8 @@ async def average_time_closed_tickets():
                 "diffInSeconds": {
                     "$divide": [
                         {"$subtract": [
-                            {"$toDate": "$ClosedAt"},
-                            {"$toDate": "$CreatedAt"}
+                            {"$toDate": "$closed_at"},
+                            {"$toDate": "$created_at"}
                         ]},
                         1000  
                     ]
