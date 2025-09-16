@@ -2,8 +2,10 @@ from fastapi import APIRouter
 from typing import Dict, Any
 from api_6sem_back_end.services.ticket_service import TicketService
 from api_6sem_back_end.models.ticket import TicketPeriod
+from api_6sem_back_end.db.db_configuration import db
 
 router = APIRouter(prefix="/tickets", tags=["tickets"])
+collection = db["tickets"]
 
 @router.post("/by_period", response_model=Dict[str, Any])
 def count_tickets(request: TicketPeriod):

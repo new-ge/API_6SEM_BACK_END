@@ -8,5 +8,5 @@ collection = db["tickets"]
 
 @router.get("/opened/count")
 def count_opened_tickets():
-    count = collection.count_documents({"closed_at_dt": {"$in": [None, "None"]}})
+    count = collection.count_documents({"closed_at": {"$in": [None, "None"]}})
     return {"opened_tickets": count}

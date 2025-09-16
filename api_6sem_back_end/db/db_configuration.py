@@ -28,7 +28,7 @@ def db_connection_mongo(url_mongo: str):
     try:
         client = MongoClient(
             uri,
-            serverSelectionTimeoutMS=999999999,
+            serverSelectionTimeoutMS=99999999,
             connectTimeoutMS=None,
             socketTimeoutMS=None,
             tls=True
