@@ -7,7 +7,7 @@ from api_6sem_back_end.db.db_configuration import db
 router = APIRouter(prefix="/tickets", tags=["tickets"])
 collection = db["tickets"]
 
-@router.post("/by_period", response_model=Dict[str, Any])
+@router.get("/by-period", response_model=Dict[str, Any])
 def count_tickets(request: TicketPeriod):
     return TicketService.count_tickets_by_period(
         start_date=request.start_date,

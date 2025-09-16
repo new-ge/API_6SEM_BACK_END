@@ -7,16 +7,16 @@ collection = db["tickets"]
 collection.create_index("closed_at")
 
 @router.get("/closed/average-time")
-async def average_time_closed_tickets():
+def average_time_closed_tickets():
     pipeline = [
-        {"$match": {"ClosedAt": {"$ne": None}}},
+        {"$match": {"closed_at": {"$ne": None}}},
         {
             "$project": {
                 "diffInSeconds": {
                     "$divide": [
                         {"$subtract": [
-                            {"$toDate": "$closed_at"},
-                            {"$toDate": "$created_at"}
+                            "$closed_at",
+                            "$created_at"
                         ]},
                         1000
                     ]
@@ -31,7 +31,9 @@ async def average_time_closed_tickets():
         }
     ]
 
-    result = await collection.aggregate(pipeline).to_list(length=1)
+    print(pipeline)
+
+    result = list(collection.aggregate(pipeline))
 
     if not result:
         return {"average_duration_minutes": 0}

@@ -1,8 +1,9 @@
 import os
-from api_6sem_back_end.db.db_configuration import db_connection_mongo, db_connection_sql_server
+from api_6sem_back_end.db.db_configuration import db_connection_mongo, db_connection_sql_server, db
 import datetime
 from api_6sem_back_end.db.db_security import encrypt_data
-from pymongo.errors import BulkWriteError, DuplicateKeyError
+from pymongo.errors import BulkWriteError
+from pymongo import UpdateOne
 import json
 
 def process_data_sql_server(columns_to_keep):
@@ -146,13 +147,17 @@ def create_collections_mongo_db(all_tables):
 
     return history_docs, tickets_docs, users_docs
 
-def save_on_mongo_db(**collections_docs):
-    db = db_connection_mongo(os.getenv("DB_URL_MONGO"))
+def save_on_mongo_db_collections(**collections_docs):
+    for collection_name in collections_docs.keys():
+        db[collection_name].create_index("agent_id", unique=True, sparse=True)
+        db[collection_name].create_index("audit_id", unique=True, sparse=True)
+        db[collection_name].create_index("ticket_id", unique=True, sparse=True)
 
     for collection_name, docs in collections_docs.items():
         if not docs:
             continue
 
+        operations = []
         for doc in docs:
             if doc.get("agent_id"):
                 filter_query = {"agent_id": doc["agent_id"]}
@@ -163,11 +168,23 @@ def save_on_mongo_db(**collections_docs):
             else:
                 continue
 
-            try:
-                db[collection_name].update_one(
+            operations.append(
+                UpdateOne(
                     filter_query,
                     {"$set": doc},
                     upsert=True
                 )
-            except (DuplicateKeyError, BulkWriteError) as e:
-                print(f"Erro ao salvar: {e}")
+            )
+
+        if operations:
+            try:
+                result = db[collection_name].bulk_write(operations, ordered=False)
+
+                print(
+                    f"[{collection_name}] "
+                    f"Inseridos: {result.upserted_count}, "
+                    f"Atualizados: {result.modified_count}, "
+                    f"Ignorados: {len(operations) - result.upserted_count - result.modified_count}"
+                )
+            except BulkWriteError as e:
+                print(f"Erro ao salvar: {e.details}")

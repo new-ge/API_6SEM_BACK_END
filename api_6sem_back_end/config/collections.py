@@ -1,1 +1,1 @@
-collections = ["ticket", "history", "users"]
+collections = ["tickets", "history", "users"]
