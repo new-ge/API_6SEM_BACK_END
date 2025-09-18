@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from api_6sem_back_end.db.db_configuration import db
 from api_6sem_back_end.utils.query_filter import build_query_filter, Filtro
 
-router = APIRouter(prefix="/tickets", tags=["tickets"])
+router = APIRouter(prefix="/tickets", tags=["Tickets"])
 collection = db["tickets"]
 collection.create_index("closed_at")
 
