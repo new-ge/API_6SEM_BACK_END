@@ -1,10 +1,11 @@
-from api_6sem_back_end.db import collection
+from api_6sem_back_end.db.db_configuration import db
 from datetime import datetime
 
+collection = db["tickets"]
 
 class TicketRepository:
     @staticmethod
-    async def count_by_period(start_date: datetime, end_date: datetime):
+    def count_by_period(start_date: datetime, end_date: datetime):
         pipeline = [
             {
                 "$match": {
@@ -16,9 +17,7 @@ class TicketRepository:
             },
             {
                 "$group": {
-                    "_id": {
-                        "day": {"$dateToString": {"format": "%Y-%m-%d", "date": "$created_at"}}
-                    },
+                    "_id": {"day": {"$dateToString": {"format": "%Y-%m-%d", "date": "$created_at"}}},
                     "count": {"$sum": 1}
                 }
             },
@@ -26,4 +25,4 @@ class TicketRepository:
         ]
 
         cursor = collection.aggregate(pipeline)
-        return await cursor.to_list(length=None)
+        return list(cursor)  # síncrono
