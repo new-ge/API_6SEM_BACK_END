@@ -42,3 +42,5 @@ def db_connection_mongo(url_mongo: str):
         return None
 
 db = db_connection_mongo(os.getenv("DB_URL_MONGO"))
+
+#
