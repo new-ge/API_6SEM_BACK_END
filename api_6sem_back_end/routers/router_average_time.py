@@ -1,15 +1,19 @@
 from fastapi import APIRouter
 from api_6sem_back_end.db.db_configuration import db
+from api_6sem_back_end.utils.query_filter import build_query_filter, Filtro
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 
 collection = db["tickets"]
 collection.create_index("closed_at")
 
-@router.get("/closed/average-time")
-def average_time_closed_tickets():
+@router.post("/closed/average-time")
+def average_time_closed_tickets(filtro: Filtro):
+    base_filter = {"closed_at": {"$ne": None}}
+
+    query_filter = build_query_filter(filtro.filtro, base_filter)
     pipeline = [
-        {"$match": {"closed_at": {"$ne": None}}},
+        {"$match": query_filter},
         {
             "$project": {
                 "diffInSeconds": {
