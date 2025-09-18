@@ -4,16 +4,8 @@ import os
 from dotenv import load_dotenv
 import glob
 
-#dotenv_path = glob.glob(os.path.join(os.path.dirname(__file__), "*.env"))
-#load_dotenv(dotenv_path[0])
-
 dotenv_path = glob.glob(os.path.join(os.path.dirname(__file__), "*.env"))
-print(">>> Arquivos .env encontrados:", dotenv_path)
-
-if dotenv_path:
-    load_dotenv(dotenv_path[0])
-else:
-    print(">>> Nenhum .env encontrado nessa pasta:", os.path.dirname(__file__))
+load_dotenv(dotenv_path[0])
 
 
 def db_connection_sql_server(url_driver: str, server: str, db_name: str):

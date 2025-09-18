@@ -25,4 +25,4 @@ class TicketRepository:
         ]
 
         cursor = collection.aggregate(pipeline)
-        return list(cursor)  # síncrono
+        return list(cursor)
