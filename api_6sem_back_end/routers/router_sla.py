@@ -1,13 +1,18 @@
 from fastapi import APIRouter
-from api_6sem_back_end.db.db_configuration import db  
+from api_6sem_back_end.db.db_configuration import db
+from api_6sem_back_end.utils.query_filter import build_query_filter, Filtro
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 collection = db["tickets"]  
 
-@router.get("/closed/exceeded-sla")
-def tickets_exceeded_sla():
+@router.post("/closed/exceeded-sla")
+def tickets_exceeded_sla(filtro: Filtro):
+    base_filter = {"closed_at": {"$ne": None}}
+
+    query_filter = build_query_filter(filtro.filtro, base_filter)
+
     pipeline = [
-        {"$match": {"closed_at": {"$ne": None}}},
+        {"$match": query_filter},
         {
             "$project": {
                 "sla_target_minutes": "$sla.target_minutes",
@@ -26,7 +31,7 @@ def tickets_exceeded_sla():
             "$group": {
                 "_id": None,
                 "total_chamados": {"$sum": 1},
-                "total_excedidos": {
+                "sla_exceeded": {
                     "$sum": {
                         "$cond": [
                             {"$gt": ["$tempo_total_minutes", "$sla_target_minutes"]},
@@ -40,10 +45,11 @@ def tickets_exceeded_sla():
     ]
 
     result = list(collection.aggregate(pipeline))
+    print(result)
 
     if not result:
-        return {"total_excedidos": 0}
+        return {"sla_exceeded": 0}
 
     return {
-        "total_excedidos": result[0]["total_excedidos"]
+        "sla_exceeded": result[0]["sla_exceeded"]
     }
