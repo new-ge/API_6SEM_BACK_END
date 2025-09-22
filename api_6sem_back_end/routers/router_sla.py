@@ -45,7 +45,6 @@ def tickets_exceeded_sla(filtro: Filtro):
     ]
 
     result = list(collection.aggregate(pipeline))
-    print(result)
 
     if not result:
         return {"sla_exceeded": 0}
