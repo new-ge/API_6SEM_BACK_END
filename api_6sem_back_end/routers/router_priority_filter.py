@@ -1,37 +1,31 @@
 from fastapi import APIRouter
 from api_6sem_back_end.db.db_configuration import db
+from pydantic import BaseModel
+from typing import Dict, Any
 
 router = APIRouter(prefix="/tickets", tags=["tickets"])
 collection = db["tickets"]
-collection.create_index("priority")
 
-@router.get("/priorities")
-def get_priorities_by_ticket():
-    pipeline = [
-        {
-            "$match": {
-                "TicketId": {"$exists": True, "$ne": None},
-                "priority": {"$exists": True, "$ne": None}
-            }
-        },
-        {
-            "$project": {
-                "_id": 0,
-                "TicketId": 1,
-                "priority": 1
-            }
-        }
-    ]
+class Filtro(BaseModel):
+    filtro: Dict[str, Any]
+
+@router.post("/priorities")
+def count_opened_tickets(filtro: Filtro):
+    query_filter = {}
+  
+    query_filter["closed_at"] = { "$in": [None] }
     
-    result = collection.aggregate(pipeline)
+    if filtro and filtro.filtro:
+        for k, v in filtro.filtro.items():
+            if v not in [None, "", [], {}]:
+                query_filter[k] = v
 
-    priorities = {doc["TicketId"]: doc["priority"] for doc in result}
-
-    return priorities
-
+    count = collection.count_documents(query_filter)
+    return {"opened_tickets": count}
 
 @router.get("/test")
 def test():
     cursor = collection.find({})
     tickets = list(cursor)
     return tickets
+
