@@ -1,6 +1,13 @@
+from api_6sem_back_end.db.db_configuration import db
+from api_6sem_back_end.utils.query_filter import build_query_filter
+
+from api_6sem_back_end.models.filter import Filter  
+
+collection = db["tickets"]
+
 class TicketService:
     @staticmethod
-    async def count_tickets_by_category(filtro: Filtro):
+    def count_tickets_by_category(filtro: Filter):
         query_filter = build_query_filter(filtro.filtro)
 
         pipeline = [
@@ -21,8 +28,5 @@ class TicketService:
             {"$sort": {"count": -1}}
         ]
 
-        cursor = collection.aggregate(pipeline)
-        result = []
-        async for doc in cursor:
-            result.append(doc)
+        result = list(collection.aggregate(pipeline))
         return result
