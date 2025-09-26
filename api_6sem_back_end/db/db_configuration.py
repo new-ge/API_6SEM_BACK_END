@@ -4,8 +4,16 @@ import os
 from dotenv import load_dotenv
 import glob
 
+#dotenv_path = glob.glob(os.path.join(os.path.dirname(__file__), "*.env"))
+#load_dotenv(dotenv_path[0])
+
 dotenv_path = glob.glob(os.path.join(os.path.dirname(__file__), "*.env"))
-load_dotenv(dotenv_path[0])
+print(">>> Arquivos .env encontrados:", dotenv_path)
+
+if dotenv_path:
+    load_dotenv(dotenv_path[0])
+else:
+    print(">>> Nenhum .env encontrado nessa pasta:", os.path.dirname(__file__))
 
 def db_connection_sql_server(url_driver: str, server: str, db_name: str):
     conn_str = (
@@ -24,6 +32,10 @@ def db_connection_sql_server(url_driver: str, server: str, db_name: str):
 
 def db_connection_mongo(url_mongo: str):
     uri = url_mongo
+
+    print(">>> DB_URL_MONGO:", os.getenv("DB_URL_MONGO"))
+    print(">>> DB_MONGO:", os.getenv("DB_MONGO"))
+
 
     try:
         client = MongoClient(
