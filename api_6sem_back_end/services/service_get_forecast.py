@@ -1,10 +1,7 @@
 from fastapi import APIRouter
-from prophet.diagnostics import performance_metrics, cross_validation
 
 from api_6sem_back_end.ia.train_tendency_line import train_model
 from api_6sem_back_end.utils.query_filter import Filtro
-
-router = APIRouter(prefix="/tickets", tags=["Tickets"])
 
 def get_forecast(filtro: Filtro):
     model, df_grouped = train_model(filtro, train_until="2025-08-31")

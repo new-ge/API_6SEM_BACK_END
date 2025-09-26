@@ -8,7 +8,7 @@ import api_6sem_back_end.models.model_store as store
 collection = db["tickets"]
 collection.create_index("created_at")
 
-def create_prophet_instance() -> Prophet:
+def create_prophet_instance():
     model = Prophet(
         yearly_seasonality=True,
         weekly_seasonality=False,
@@ -26,7 +26,7 @@ def train_model(filtro: Filtro = None, train_until: str = None):
         store.prophet_cache = {}
 
     query_filter = build_query_filter(filtro) if filtro else {}
-    print(query_filter)
+
     cache_key = json.dumps(query_filter, sort_keys=True)
 
     if cache_key in store.prophet_cache:
