@@ -5,29 +5,32 @@ collection = db["tickets"]
 
 class TicketService:
     @staticmethod
-    async def count_tickets_by_category(filtro: Filtro):
+    def count_tickets_by_month(filtro: Filtro):
         query_filter = build_query_filter(filtro.filtro)
 
         pipeline = [
             {"$match": query_filter},
             {
                 "$group": {
-                    "_id": "$categoria",
+                    "_id": {"$month": "$created_at"},
                     "count": {"$sum": 1}
                 }
             },
             {
                 "$project": {
                     "_id": 0,
-                    "categoria": "$_id",
+                    "month": {
+                        "$cond": [
+                            {"$lt": ["$_id", 10]},
+                            {"$concat": ["0", {"$toString": "$_id"}]},
+                            {"$toString": "$_id"}
+                        ]
+                    },
                     "count": 1
                 }
             },
-            {"$sort": {"count": -1}}
+            {"$sort": {"month": 1}}
         ]
 
-        cursor = collection.aggregate(pipeline)
-        result = []
-        async for doc in cursor:
-            result.append(doc)
-        return result
+        result = list(collection.aggregate(pipeline))
+        return {doc["month"]: doc["count"] for doc in result}

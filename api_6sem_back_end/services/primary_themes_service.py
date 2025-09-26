@@ -1,13 +1,11 @@
 from api_6sem_back_end.db.db_configuration import db
-from api_6sem_back_end.utils.query_filter import build_query_filter
-
-from api_6sem_back_end.models.filter import Filter  
+from api_6sem_back_end.utils.query_filter import build_query_filter, Filtro
 
 collection = db["tickets"]
 
 class TicketService:
     @staticmethod
-    def count_tickets_by_category(filtro: Filter):
+    def count_tickets_by_category(filtro: Filtro):
         query_filter = build_query_filter(filtro.filtro)
 
         pipeline = [

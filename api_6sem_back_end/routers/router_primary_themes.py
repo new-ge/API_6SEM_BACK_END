@@ -5,11 +5,7 @@ from api_6sem_back_end.utils.query_filter import Filtro
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 
-@router.get("/primary-themes")
-async def principais_temas(categoria: Optional[str] = Query(None)):
-    filtro = Filtro(filtro={})
-    if categoria:
-        filtro.filtro = {"categoria": categoria}
+@router.post("/primary-themes")
+async def principais_temas(filtro: Filtro):
+    return TicketService.count_tickets_by_category(filtro)
 
-    result = TicketService.count_tickets_by_category(filtro)
-    return result
