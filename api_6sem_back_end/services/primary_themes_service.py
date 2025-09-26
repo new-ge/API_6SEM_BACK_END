@@ -14,7 +14,7 @@ class TicketService:
             {"$match": query_filter},
             {
                 "$group": {
-                    "_id": "$categoria",
+                    "_id": "$category",
                     "count": {"$sum": 1}
                 }
             },

@@ -11,5 +11,5 @@ async def principais_temas(categoria: Optional[str] = Query(None)):
     if categoria:
         filtro.filtro = {"categoria": categoria}
 
-    result = TicketService.count_tickets_by_category(filtro)  # sem await
+    result = TicketService.count_tickets_by_category(filtro)
     return result
