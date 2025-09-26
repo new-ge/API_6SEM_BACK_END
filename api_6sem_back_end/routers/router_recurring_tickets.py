@@ -7,7 +7,7 @@ collection = db["tickets"]
 
 @router.post("/recurring-tickets")
 def recurring_tickets(filtro: Filtro):
-    query_filter = build_query_filter(filtro.filtro)
+    query_filter = build_query_filter(filtro)
 
     pipeline = [
     { "$match": query_filter },

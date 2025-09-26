@@ -79,6 +79,11 @@ def create_collections_mongo_db(all_tables):
     category_lookup = {d["CategoryId"]: d["Name"] for d in all_tables["Categories"]}
     sub_category_lookup = {d["SubcategoryId"]: d["Name"] for d in all_tables["Subcategories"]}
     tag_lookup = {t["TagId"]: t["Name"] for t in all_tables["Tags"]}
+    access_level_lookup = {t["NivelId"]: t["Acesso"] for t in all_tables["AccessLevel"]}
+    agent_access_lookup = {
+        agent["AgentId"]: access_level_lookup.get(agent.get("NivelId"))
+        for agent in all_tables["Agents"]
+    }
 
     tags_by_ticket = {}
     for tt in all_tables["TicketTags"]:
@@ -105,7 +110,7 @@ def create_collections_mongo_db(all_tables):
             "name": agent["FullName"],
             "email": agent["Email"],
             "department": department_lookup.get(agent.get("DepartmentId")),
-            "role": "",
+            "role": access_level_lookup.get(agent.get("NivelId")).strip(),
             "isActive": agent.get("IsActive", True),
             "login": {
                 "username": "",
@@ -132,6 +137,7 @@ def create_collections_mongo_db(all_tables):
             "history": history_by_ticket.get(ticket["TicketId"], []),
             "created_at": ticket["CreatedAt"],
             "closed_at": ticket["ClosedAt"],
+            "access_level": agent_access_lookup.get(ticket.get("AssignedAgentId")).strip()
         }
         tickets_docs.append(ticket_collection)
 

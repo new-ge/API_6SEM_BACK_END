@@ -5,11 +5,11 @@ from datetime import datetime
 class Filtro(BaseModel):
     filtro: Dict[str, Any]
 
-def build_query_filter(filtro, base_filter=None):
+def build_query_filter(filtro: Filtro, base_filter=None):
     query_filter = base_filter.copy() if base_filter else {}
 
     if filtro:
-        for k, v in filtro.items():
+        for k, v in filtro.filtro.items():
             if v in [None, "", [], {}]:
                 continue
 
@@ -27,3 +27,4 @@ def build_query_filter(filtro, base_filter=None):
                 query_filter[k] = {"$in": v}
 
     return query_filter
+
