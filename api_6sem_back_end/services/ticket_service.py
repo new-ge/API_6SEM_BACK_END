@@ -6,7 +6,7 @@ collection = db["tickets"]
 class TicketService:
     @staticmethod
     def count_tickets_by_month(filtro: Filtro):
-        query_filter = build_query_filter(filtro.filtro)
+        query_filter = build_query_filter(filtro)
 
         pipeline = [
             {"$match": query_filter},

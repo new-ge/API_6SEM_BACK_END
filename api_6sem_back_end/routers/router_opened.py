@@ -10,7 +10,7 @@ collection.create_index("closed_at")
 def count_opened_tickets(filtro: Filtro):
     base_filter = {"closed_at": {"$in": [None]}}
 
-    query_filter = build_query_filter(filtro.filtro, base_filter)
+    query_filter = build_query_filter(filtro, base_filter)
 
     count = collection.count_documents(query_filter)
 

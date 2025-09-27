@@ -9,7 +9,7 @@ collection = db["tickets"]
 def tickets_exceeded_sla(filtro: Filtro):
     base_filter = {"closed_at": {"$ne": None}}
 
-    query_filter = build_query_filter(filtro.filtro, base_filter)
+    query_filter = build_query_filter(filtro, base_filter)
 
     pipeline = [
         {"$match": query_filter},
