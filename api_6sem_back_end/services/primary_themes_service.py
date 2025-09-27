@@ -6,7 +6,7 @@ collection = db["tickets"]
 class TicketService:
     @staticmethod
     def count_tickets_by_category(filtro: Filtro):
-        query_filter = build_query_filter(filtro.filtro)
+        query_filter = build_query_filter(filtro)
 
         pipeline = [
             {"$match": query_filter},
@@ -27,4 +27,4 @@ class TicketService:
         ]
 
         result = list(collection.aggregate(pipeline))
-        return result
+        return {"primary_themes": result}
