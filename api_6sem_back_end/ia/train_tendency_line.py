@@ -1,0 +1,91 @@
+import json
+import pandas as pd
+from prophet import Prophet
+from api_6sem_back_end.db.db_configuration import db
+from api_6sem_back_end.utils.query_filter import Filtro, build_query_filter
+import api_6sem_back_end.models.model_store as store
+
+collection = db["tickets"]
+collection.create_index("created_at")
+
+def create_prophet_instance():
+    model = Prophet(
+        yearly_seasonality=True,
+        weekly_seasonality=False,
+        daily_seasonality=False,
+        changepoint_prior_scale=0.3,
+        seasonality_prior_scale=0.1,
+        mcmc_samples=0
+    )
+    model.add_seasonality(name="monthly", period=30.5, fourier_order=5)
+    return model
+
+
+def train_model(filtro: Filtro = None, train_until: str = None):
+    if not hasattr(store, "prophet_cache") or not isinstance(store.prophet_cache, dict):
+        store.prophet_cache = {}
+
+    query_filter = build_query_filter(filtro) if filtro else {}
+
+    cache_key = json.dumps(query_filter, sort_keys=True)
+
+    if cache_key in store.prophet_cache:
+
+        print("Modelo já treinado. Reutilizando cache...")
+        return (
+            store.prophet_cache[cache_key]["model"],
+            store.prophet_cache[cache_key]["df"],
+        )
+
+    pipeline = [
+        {"$match": query_filter},
+        {
+            "$group": {
+                "_id": {
+                    "year": {"$year": "$created_at"},
+                    "month": {"$month": "$created_at"},
+                },
+                "y": {"$sum": 1},
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "ds": {
+                    "$dateFromParts": {
+                        "year": "$_id.year",
+                        "month": "$_id.month",
+                        "day": 1,
+                    }
+                },
+                "y": 1,
+            }
+        },
+        {"$sort": {"ds": 1}},
+    ]
+
+    cursor = collection.aggregate(pipeline, allowDiskUse=True)
+    df_grouped = pd.DataFrame.from_records(cursor)
+
+    df_grouped["ds"] = pd.to_datetime(df_grouped["ds"])
+
+    df_grouped = df_grouped.sort_values("ds").reset_index(drop=True)
+
+    if train_until:
+        df_grouped = df_grouped[df_grouped["ds"] <= pd.to_datetime(train_until)]
+
+    model = create_prophet_instance()
+
+    print("Treinando modelo Prophet...")
+    model.fit(df_grouped)
+
+    store.prophet_cache[cache_key] = {
+        "model": model,
+        "df": df_grouped
+    }
+
+    return model, df_grouped
+
+
+def get_model():
+    return store.prophet_cache

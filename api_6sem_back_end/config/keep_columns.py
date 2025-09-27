@@ -1,5 +1,5 @@
 columns_to_keep = {
-    "Agents": ["AgentId", "FullName", "Email", "IsActive", "DepartmentId"],
+    "Agents": ["AgentId", "FullName", "Email", "IsActive", "DepartmentId", "NivelId"],
     "AuditLogs": ["AuditId", "Operation", "PerformedBy", "DetailsJson", "PerformedAt"],
     "Categories": ["CategoryId", "Name"],
     "Departments": ["DepartmentId", "Name"],
@@ -11,5 +11,6 @@ columns_to_keep = {
     "Tags": ["TagId", "Name"],
     "TicketTags": ["TagId", "TicketId"],
     "TicketStatusHistory": ["HistoryId", "TicketId", "FromStatusId", "ToStatusId"],
-    "Tickets": ["TicketId", "Title", "Description", "CreatedAt", "ClosedAt", "CurrentStatusId", "ProductId", "PriorityId", "CategoryId", "SLAPlanId", "SubcategoryId"]
+    "Tickets": ["AssignedAgentId", "TicketId", "Title", "Description", "CreatedAt", "ClosedAt", "CurrentStatusId", "ProductId", "PriorityId", "CategoryId", "SLAPlanId", "SubcategoryId"],
+    "AccessLevel": ["NivelId", "Acesso"]
 }

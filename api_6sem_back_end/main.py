@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+<<<<<<< HEAD
 from api_6sem_back_end.routers import router_opened, router_average_time, router_by_period, router_tag_filter, router_sla, router_recurring_tickets, router_sentiment
+=======
+from api_6sem_back_end.routers import router_opened, router_average_time, router_by_period, router_primary_themes, router_tag_filter, router_sla, router_recurring_tickets
+>>>>>>> dev
 
 app = FastAPI()
 
@@ -23,7 +27,11 @@ app.include_router(router_opened.router)
 app.include_router(router_tag_filter.router)
 app.include_router(router_sla.router)
 app.include_router(router_recurring_tickets.router)
+<<<<<<< HEAD
 app.include_router(router_sentiment)
+=======
+app.include_router(router_primary_themes.router)
+>>>>>>> dev
 
 @app.get("/")
 async def root():
