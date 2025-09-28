@@ -23,7 +23,7 @@ app.include_router(router_opened.router)
 app.include_router(router_tag_filter.router)
 app.include_router(router_sla.router)
 app.include_router(router_recurring_tickets.router)
-app.include_router(router_sentiment)
+app.include_router(router_sentiment.router)
 app.include_router(router_primary_themes.router)
 
 
