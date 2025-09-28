@@ -35,9 +35,7 @@ def train_model(filtro: Filtro = None, train_until: str = None):
     query_filter = build_query_filter(filtro)
     cache_key = json.dumps(query_filter, sort_keys=True, default=json_serializer)
 
-    # Se DataFrame está no cache, reutiliza
     if cache_key in store.prophet_cache:
-        print("DataFrame já processado. Recriando modelo...")
         df_grouped = store.prophet_cache[cache_key]
     else:
         pipeline = [
@@ -80,7 +78,6 @@ def train_model(filtro: Filtro = None, train_until: str = None):
 
     model = create_prophet_instance()
 
-    print("Treinando modelo Prophet...")
     model.fit(df_grouped)
 
     return model, df_grouped

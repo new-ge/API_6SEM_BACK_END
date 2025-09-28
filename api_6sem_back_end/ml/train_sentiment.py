@@ -1,4 +1,5 @@
 from datetime import datetime
+import gc
 import json
 from flair.models import TextClassifier
 from flair.data import Sentence
@@ -9,6 +10,7 @@ from cachetools import LRUCache
 
 collection = db["tickets"]
 collection.create_index("description")
+classifier = TextClassifier.load("sentiment-fast")
 
 def json_serializer(obj):
     if isinstance(obj, datetime):
@@ -25,8 +27,6 @@ def train_sentiment_model(filtro: Filtro = None):
     if cache_key in store.sentiment_cache:
         return store.sentiment_cache[cache_key]
 
-    classifier = TextClassifier.load("sentiment-fast")
-
     pipeline = [
         {"$match": query_filter},
         {"$group": {"_id": "$description", "count": {"$sum": 1}}},
@@ -39,14 +39,15 @@ def train_sentiment_model(filtro: Filtro = None):
     resultado = {"positive": 0, "negative": 0, "neutral": 0}
 
     batch_size = 64
-    sentences = []
-    counts = []
+    sentences, counts = [], []
 
     for row in cursor:
         desc = row["description"].strip()
-        if desc:
-            sentences.append(Sentence(desc))
-            counts.append(row["count"])
+        if not desc:
+            continue
+
+        sentences.append(Sentence(desc))
+        counts.append(row["count"])
 
         if len(sentences) >= batch_size:
             classifier.predict(sentences, mini_batch_size=batch_size)
@@ -58,10 +59,10 @@ def train_sentiment_model(filtro: Filtro = None):
                     resultado["negative"] += count
                 else:
                     resultado["neutral"] += count
-            sentences = []
-            counts = []
+            sentences.clear()
+            counts.clear()
+            gc.collect()
 
-    # Processar o que sobrou
     if sentences:
         classifier.predict(sentences, mini_batch_size=batch_size)
         for sentence, count in zip(sentences, counts):
@@ -72,6 +73,9 @@ def train_sentiment_model(filtro: Filtro = None):
                 resultado["negative"] += count
             else:
                 resultado["neutral"] += count
+        sentences.clear()
+        counts.clear()
+        gc.collect()
 
     store.sentiment_cache[cache_key] = resultado
     return resultado
