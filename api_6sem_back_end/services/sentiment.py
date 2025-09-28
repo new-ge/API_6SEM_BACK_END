@@ -1,9 +1,9 @@
 import os
 import joblib
 
-from api_6sem_back_end.db_configuration import db
+from api_6sem_back_end.db.db_configuration import db
 
-collection = db["your_collection_name"]  # ajuste o nome da sua collection
+collection = db["ticket"]
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "../ml/sentiment_model.pkl")
 model = joblib.load(MODEL_PATH)
