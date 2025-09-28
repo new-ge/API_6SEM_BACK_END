@@ -1,6 +1,4 @@
-from fastapi import APIRouter
-
-from api_6sem_back_end.ia.train_tendency_line import train_model
+from api_6sem_back_end.ml.train_tendency_line import train_model
 from api_6sem_back_end.utils.query_filter import Filtro
 
 def get_forecast(filtro: Filtro):
