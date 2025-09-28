@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-<<<<<<< HEAD
 from api_6sem_back_end.routers import router_opened, router_average_time, router_by_period, router_tag_filter, router_sla, router_recurring_tickets, router_sentiment,router_primary_themes
 
 app = FastAPI()
