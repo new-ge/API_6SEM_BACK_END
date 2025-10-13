@@ -24,7 +24,6 @@ def db_connection_sql_server(url_driver: str, server: str, db_name: str):
 
 def db_connection_mongo(url_mongo: str):
     uri = url_mongo
-
     try:
         client = MongoClient(
             uri,
@@ -40,4 +39,18 @@ def db_connection_mongo(url_mongo: str):
         print("Erro na conexão:", e)
         return None
 
+# Realiza a conexão MongoDB
 db = db_connection_mongo(os.getenv("DB_URL_MONGO"))
+
+# Exemplo de verificação da coleção
+if db is not None:  # Compare explicitamente com None
+    try:
+        # Suponha que você tenha uma coleção chamada 'tickets'
+        tickets_collection = db["tickets"]
+        # Listar alguns documentos da coleção
+        for ticket in tickets_collection.find().limit(5):
+            print(ticket)
+    except Exception as e:
+        print("Erro ao acessar a coleção:", e)
+else:
+    print("Erro: Não foi possível conectar ao banco de dados MongoDB.")
