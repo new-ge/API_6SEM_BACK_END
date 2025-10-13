@@ -1,12 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from api_6sem_back_end.db.db_configuration import db
+from api_6sem_back_end.repositories.repository_login_security import verify_token
 from api_6sem_back_end.utils.query_filter import build_query_filter, Filtro
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 collection = db["tickets"]  
 
 @router.post("/closed/exceeded-sla")
-def tickets_exceeded_sla(filtro: Filtro):
+def tickets_exceeded_sla(payload=Depends(verify_token), filtro: Filtro = ""):
     base_filter = {"closed_at": {"$ne": None}}
 
     query_filter = build_query_filter(filtro, base_filter)
