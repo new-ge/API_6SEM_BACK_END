@@ -34,3 +34,25 @@ class TicketService:
 
         result = list(collection.aggregate(pipeline))
         return {doc["month"]: doc["count"] for doc in result}
+
+    @staticmethod
+    def get_open_tickets_volume_by_level(user_level: str):
+
+        levels_map = {
+            "N1": ["N1"],
+            "N2": ["N1", "N2"],
+            "N3": ["N1", "N2", "N3"]
+        }
+
+        allowed_levels = levels_map.get(user_level.upper(), [])
+
+        query_filter = {
+            "closed_at": None,
+            "access_level": {"$in": allowed_levels}
+        }
+
+        volume = collection.count_documents(query_filter)
+
+        return {
+            "volume": volume
+        }

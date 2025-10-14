@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api_6sem_back_end.routers import router_login, router_opened, router_average_time, router_by_period, router_tag_filter, router_sla, router_recurring_tickets, router_sentiment, router_primary_themes
+from api_6sem_back_end.routers import router_login, router_opened, router_average_time, router_by_period, router_tag_filter, router_sla, router_recurring_tickets, router_sentiment, router_primary_themes, router_login
 import os
 from dotenv import load_dotenv
 import glob
@@ -32,8 +32,8 @@ app.include_router(router_sla.router)
 app.include_router(router_recurring_tickets.router)
 app.include_router(router_sentiment.router)
 app.include_router(router_primary_themes.router)
-app.include_router(router_sentiment.router)
 app.include_router(router_login.router)
+
 
 @app.get("/")
 def auto_login():
