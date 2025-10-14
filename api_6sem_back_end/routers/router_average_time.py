@@ -11,6 +11,19 @@ collection.create_index("closed_at")
 def average_time_closed_tickets(filtro: Filtro):
     base_filter = {"closed_at": {"$ne": None}}
 
+    if hasattr(filtro, "role") and filtro.role and filtro.role != "Gestor":
+        role = filtro.role.upper().strip()
+
+        role_hierarchy = {
+            "N3": ["N1", "N2", "N3"],
+            "N2": ["N1", "N2"],
+            "N1": ["N1"]
+        }
+        
+        roles_visiveis = role_hierarchy.get(role, ["N1"])
+
+        base_filter["access_level"] = {"$in": roles_visiveis}
+
     query_filter = build_query_filter(filtro, base_filter)
     pipeline = [
         {"$match": query_filter},
