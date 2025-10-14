@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from api_6sem_back_end.db.db_configuration import db
+from api_6sem_back_end.repositories.repository_login_security import verify_token
 from api_6sem_back_end.utils.query_filter import build_query_filter, Filtro
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
@@ -8,23 +9,23 @@ collection = db["tickets"]
 collection.create_index("closed_at")
 
 @router.post("/closed/average-time")
-def average_time_closed_tickets(filtro: Filtro):
+def average_time_closed_tickets(payload=Depends(verify_token), filtro: Filtro = ""):
     base_filter = {"closed_at": {"$ne": None}}
 
-    if hasattr(filtro, "role") and filtro.role and filtro.role != "Gestor":
-        role = filtro.role.upper().strip()
+    if payload.get("role") != "Gestor":
+        user_access = payload.get("role")
 
-        role_hierarchy = {
-            "N3": ["N1", "N2", "N3"],
-            "N2": ["N1", "N2"],
-            "N1": ["N1"]
-        }
-        
-        roles_visiveis = role_hierarchy.get(role, ["N1"])
+        levels_hierarchy = ["N1", "N2", "N3"]
 
-        base_filter["access_level"] = {"$in": roles_visiveis}
+        if user_access in levels_hierarchy:
+            idx = levels_hierarchy.index(user_access)
+            allowed_levels = levels_hierarchy[: idx + 1]
+            base_filter["role"] = {"$in": allowed_levels}
 
     query_filter = build_query_filter(filtro, base_filter)
+
+    print(query_filter)
+
     pipeline = [
         {"$match": query_filter},
         {

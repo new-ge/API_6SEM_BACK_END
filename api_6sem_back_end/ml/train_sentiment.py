@@ -17,7 +17,7 @@ def json_serializer(obj):
         return obj.isoformat()
     raise TypeError(f"Type {type(obj)} not serializable")
 
-def train_sentiment_model(filtro: Filtro = None):
+def train_sentiment_model(filtro: Filtro = None, include_positive: bool = False):
     if not hasattr(store, "sentiment_cache") or not isinstance(store.sentiment_cache, dict):
         store.sentiment_cache = LRUCache(maxsize=3)
 
@@ -78,4 +78,9 @@ def train_sentiment_model(filtro: Filtro = None):
         gc.collect()
 
     store.sentiment_cache[cache_key] = resultado
-    return resultado
+
+    if include_positive:
+        return {"positive": resultado["positive"], "negative": resultado["negative"]}
+    else:
+        return {"negative": resultado["negative"]}
+
