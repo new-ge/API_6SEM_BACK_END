@@ -32,7 +32,6 @@ app.include_router(router_sla.router)
 app.include_router(router_recurring_tickets.router)
 app.include_router(router_sentiment.router)
 app.include_router(router_primary_themes.router)
-app.include_router(router_sentiment.router)
 app.include_router(router_login.router)
 
 @app.get("/")

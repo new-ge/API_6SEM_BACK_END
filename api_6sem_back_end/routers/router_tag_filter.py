@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Query
-from api_6sem_back_end.db.db_configuration import db
+from api_6sem_back_end.db.db_configuration import db_data
 from collections import defaultdict
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
-collection = db["tickets"]
+collection = db_data["tickets"]
 collection.create_index("tag")
 
 @router.get("/tags")

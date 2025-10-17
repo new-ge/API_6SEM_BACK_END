@@ -1,10 +1,27 @@
 import os
-from api_6sem_back_end.db.db_configuration import db_connection_mongo, db_connection_sql_server, db
+from api_6sem_back_end.db.db_configuration import db_connection_sql_server, db_data
 import datetime
-from api_6sem_back_end.db.db_security import encrypt_data
+from flair.models import TextClassifier
+from flair.data import Sentence
 from pymongo.errors import BulkWriteError
 from pymongo import UpdateOne
 import json
+
+_model = None
+
+def get_sentiment_model():
+    global _model
+    if _model is None:
+        print("Carregando modelo de sentimento do Flair...")
+        _model = TextClassifier.load('sentiment-fast')
+    return _model
+
+def predict_sentiment(text: str) -> str:
+    model = get_sentiment_model()
+    sentence = Sentence(text)
+    model.predict(sentence)
+    label = sentence.labels[0]
+    return label.value
 
 def process_data_sql_server(columns_to_keep):
     sql_conn = db_connection_sql_server(
@@ -47,23 +64,6 @@ def process_data_sql_server(columns_to_keep):
             columns_by_table[table_name] = columns  
         else:
             pass
-
-    return all_tables
-
-def encrypt_sensitive_fields_bson(all_tables, sensitive_fields):
-    for table_name, rows in all_tables.items():
-        fields_to_encrypt = sensitive_fields.get(table_name)
-        if not fields_to_encrypt:
-            continue
-
-        fields_to_encrypt = set(fields_to_encrypt)
-
-        def encrypt_row(row):
-            for field in fields_to_encrypt & row.keys():
-                row[field] = encrypt_data(row[field])
-            return row
-
-        all_tables[table_name] = list(map(encrypt_row, rows))
 
     return all_tables
 
@@ -120,6 +120,9 @@ def create_collections_mongo_db(all_tables):
         users_docs.append(user_collection)
 
     for ticket in all_tables["Tickets"]:
+
+        sentiment = predict_sentiment(ticket["Description"]) if ticket["Description"] else None
+
         ticket_collection = {
             "ticket_id": ticket["TicketId"],
             "title": ticket["Title"],
@@ -137,7 +140,8 @@ def create_collections_mongo_db(all_tables):
             "history": history_by_ticket.get(ticket["TicketId"], []),
             "created_at": ticket["CreatedAt"],
             "closed_at": ticket["ClosedAt"],
-            "access_level": agent_access_lookup.get(ticket.get("AssignedAgentId")).strip()
+            "access_level": agent_access_lookup.get(ticket.get("AssignedAgentId")).strip(),
+            "sentiment": sentiment
         }
         tickets_docs.append(ticket_collection)
 
@@ -155,9 +159,9 @@ def create_collections_mongo_db(all_tables):
 
 def save_on_mongo_db_collections(**collections_docs):
     for collection_name in collections_docs.keys():
-        db[collection_name].create_index("agent_id", unique=True, sparse=True)
-        db[collection_name].create_index("audit_id", unique=True, sparse=True)
-        db[collection_name].create_index("ticket_id", unique=True, sparse=True)
+        db_data[collection_name].create_index("agent_id", unique=True, sparse=True)
+        db_data[collection_name].create_index("audit_id", unique=True, sparse=True)
+        db_data[collection_name].create_index("ticket_id", unique=True, sparse=True)
 
     for collection_name, docs in collections_docs.items():
         if not docs:
@@ -184,7 +188,7 @@ def save_on_mongo_db_collections(**collections_docs):
 
         if operations:
             try:
-                result = db[collection_name].bulk_write(operations, ordered=False)
+                result = db_data[collection_name].bulk_write(operations, ordered=False)
 
                 print(
                     f"[{collection_name}] "
