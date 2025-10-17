@@ -34,8 +34,6 @@ class ServiceSentiment:
             if sentimento_upper in sentimentos_count:
                 sentimentos_count[sentimento_upper] = r["count"]
 
-        print(sentimentos_count)
-
         if not include_positive:
             return {"negative": sentimentos_count["negative"]}
         else:

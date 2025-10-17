@@ -9,7 +9,6 @@ collection = db_data["users"]
 def validate_login(username, password):
     try:
         if username == "" and password == "":
-            print("⚠️ Campos vazios — nenhuma busca feita.")
             return None
         else:
             pipeline = [

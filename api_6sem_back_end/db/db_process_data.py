@@ -12,7 +12,6 @@ _model = None
 def get_sentiment_model():
     global _model
     if _model is None:
-        print("Carregando modelo de sentimento do Flair...")
         _model = TextClassifier.load('sentiment-fast')
     return _model
 
