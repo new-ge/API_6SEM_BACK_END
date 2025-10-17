@@ -7,7 +7,7 @@ collection_users = db_data["users"]
 def delete_user(id_user: int):
     delete_user_doc = {
         "id_user": id_user,
-        "timestamp": datetime.now(timezone.utc).isoformat(timespec='seconds')
+        "timestamp": datetime.now(timezone(timedelta(hours=-3))).isoformat(timespec='seconds')
     }
 
     collection_deleted_users.insert_one(delete_user_doc)
