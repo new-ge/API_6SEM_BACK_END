@@ -7,6 +7,8 @@ collection = db["users"]
 
 @router.post("/validate-login")
 def validate_login(username, password):
+    print(username)
+    print(password)
     try:
         if username == "" and password == "":
             print("⚠️ Campos vazios — nenhuma busca feita.")
@@ -28,7 +30,7 @@ def validate_login(username, password):
                 }
             ]
             result = list(collection.aggregate(pipeline))
-            print(result)
+            print(result[0]["username"])
             if result:
                 token = create_jwt_token(result[0]["username"], result[0]["role"])
                 print(token)

@@ -28,11 +28,11 @@ def create_prophet_instance():
     return model
 
 
-def train_model(filtro: Filtro = None, train_until: str = None):
+def train_model(filtro: Filtro = None, train_until: str = None, custom_filter=None):
     if not hasattr(store, "prophet_cache") or not isinstance(store.prophet_cache, dict):
         store.prophet_cache = LRUCache(maxsize=3)
 
-    query_filter = build_query_filter(filtro)
+    query_filter = custom_filter or build_query_filter(filtro)
     cache_key = json.dumps(query_filter, sort_keys=True, default=json_serializer)
 
     if cache_key in store.prophet_cache:
@@ -68,6 +68,9 @@ def train_model(filtro: Filtro = None, train_until: str = None):
         cursor = collection.aggregate(pipeline)
         df_grouped = pd.DataFrame.from_records(cursor)
 
+        if df_grouped.empty:
+            return None, None
+
         df_grouped["ds"] = pd.to_datetime(df_grouped["ds"])
         df_grouped = df_grouped.sort_values("ds").reset_index(drop=True)
 
@@ -77,11 +80,9 @@ def train_model(filtro: Filtro = None, train_until: str = None):
         df_grouped = df_grouped[df_grouped["ds"] <= pd.to_datetime(train_until)]
 
     model = create_prophet_instance()
-
     model.fit(df_grouped)
 
     return model, df_grouped
-
 
 def get_model():
     return store.prophet_cache

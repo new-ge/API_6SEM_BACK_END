@@ -15,13 +15,23 @@ def count_tickets(
     filtro: Filtro = "",
     include_forecast: Optional[bool] = Query(False)
 ):
-    result_tickets = TicketService.count_tickets_by_month(filtro)
+    print(payload.get("role"))
+
+
+    result_tickets = TicketService.count_tickets_by_month(filtro, payload.get("role"))
+
+    volume_tickets = sum(result_tickets.values())
+
 
     result_forecast = None
     if include_forecast:
-        result_forecast = get_forecast(filtro)
+        result_forecast = get_forecast(filtro, payload.get("role"))
+        volume_forecast = sum(result_forecast.values())
 
     return {
         "tickets": result_tickets,
-        "forecast": result_forecast
+        "volume tickets": volume_tickets,
+        "forecast": result_forecast,
+        "volume_forecast": volume_forecast
+
     }

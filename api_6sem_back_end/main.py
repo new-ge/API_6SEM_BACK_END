@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api_6sem_back_end.routers import router_login, router_opened, router_average_time, router_by_period, router_tag_filter, router_sla, router_recurring_tickets, router_sentiment, router_primary_themes, router_login
+from api_6sem_back_end.routers import router_opened, router_average_time, router_by_period, router_tag_filter, router_sla, router_recurring_tickets, router_sentiment, router_primary_themes, router_login
 import os
 from dotenv import load_dotenv
 import glob
@@ -34,10 +34,9 @@ app.include_router(router_sentiment.router)
 app.include_router(router_primary_themes.router)
 app.include_router(router_login.router)
 
-
 @app.get("/")
 def auto_login():
-    token = validate_login(os.getenv("USERNAME_GESTOR"), os.getenv("PASSWORD_GESTOR"))
+    token = validate_login(os.getenv("USERNAME_N2"), os.getenv("PASSWORD_N2"))
     if token:
         return {"token": token}
     return {"error": "Não foi possível gerar token"}
