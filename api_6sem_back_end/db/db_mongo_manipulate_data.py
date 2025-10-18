@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from api_6sem_back_end.db.db_configuration import db_deleted, db_data
 
 collection_deleted_users = db_deleted["deleted-users"]
