@@ -8,8 +8,28 @@ collection = db["tickets"]
 
 @router.post("/closed/exceeded-sla")
 def tickets_exceeded_sla(payload=Depends(verify_token), filtro: Filtro = ""):
-    base_filter = {"closed_at": {"$ne": None}}
+    print("Payload recebido:", payload)
+    user_level = payload["role"] 
+    
+    base_filter = {
+            "closed_at": {"$ne": None}
+            }
 
+    if user_level != "Gestor":
+        levels_map = {
+        "N1": ["N1"],
+        "N2": ["N1", "N2"],
+        "N3": ["N1", "N2", "N3"]
+        }
+        
+        allowed_levels = levels_map.get(user_level.upper(), ["N1"])
+        print(allowed_levels)
+
+        base_filter = {
+            "closed_at": {"$ne": None},
+            "access_level": {"$in": allowed_levels}
+        }
+    
     query_filter = build_query_filter(filtro, base_filter)
 
     pipeline = [
@@ -44,6 +64,7 @@ def tickets_exceeded_sla(payload=Depends(verify_token), filtro: Filtro = ""):
             }
         }
     ]
+    print("Filtro final para consulta:", query_filter)
 
     result = list(collection.aggregate(pipeline))
 
