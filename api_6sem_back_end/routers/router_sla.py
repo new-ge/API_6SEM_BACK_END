@@ -7,9 +7,23 @@ router = APIRouter(prefix="/tickets", tags=["Tickets"])
 collection = db_data["tickets"]  
 
 @router.post("/closed/exceeded-sla")
-def tickets_exceeded_sla(payload=Depends(verify_token), filtro: Filtro = ""):
+def tickets_exceeded_sla(payload=Depends(verify_token), filtro: Filtro = ""): 
     base_filter = {"closed_at": {"$ne": None}}
 
+    if payload["role"] != "Gestor":
+        levels_map = {
+            "N1": ["N1"],
+            "N2": ["N1", "N2"],
+            "N3": ["N1", "N2", "N3"]
+        }
+        
+        allowed_levels = levels_map.get(payload["role"].upper())
+
+        base_filter = {
+            "closed_at": {"$ne": None},
+            "access_level": {"$in": allowed_levels}
+        }
+    
     query_filter = build_query_filter(filtro, base_filter)
 
     pipeline = [
