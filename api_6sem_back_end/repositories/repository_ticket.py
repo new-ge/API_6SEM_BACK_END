@@ -1,6 +1,6 @@
-from api_6sem_back_end.db.db_configuration import db
+from api_6sem_back_end.db.db_configuration import db_data
 
-collection = db["tickets"]
+collection = db_data["tickets"]
 
 class TicketRepository:
     @staticmethod

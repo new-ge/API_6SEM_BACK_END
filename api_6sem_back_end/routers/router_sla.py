@@ -1,29 +1,23 @@
 from fastapi import APIRouter, Depends
-from api_6sem_back_end.db.db_configuration import db
+from api_6sem_back_end.db.db_configuration import db_data
 from api_6sem_back_end.repositories.repository_login_security import verify_token
 from api_6sem_back_end.utils.query_filter import build_query_filter, Filtro
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
-collection = db["tickets"]  
+collection = db_data["tickets"]  
 
 @router.post("/closed/exceeded-sla")
-def tickets_exceeded_sla(payload=Depends(verify_token), filtro: Filtro = ""):
-    print("Payload recebido:", payload)
-    user_level = payload["role"] 
-    
-    base_filter = {
-            "closed_at": {"$ne": None}
-            }
+def tickets_exceeded_sla(payload=Depends(verify_token), filtro: Filtro = ""): 
+    base_filter = {"closed_at": {"$ne": None}}
 
-    if user_level != "Gestor":
+    if payload["role"] != "Gestor":
         levels_map = {
-        "N1": ["N1"],
-        "N2": ["N1", "N2"],
-        "N3": ["N1", "N2", "N3"]
+            "N1": ["N1"],
+            "N2": ["N1", "N2"],
+            "N3": ["N1", "N2", "N3"]
         }
         
-        allowed_levels = levels_map.get(user_level.upper(), ["N1"])
-        print(allowed_levels)
+        allowed_levels = levels_map.get(payload["role"].upper())
 
         base_filter = {
             "closed_at": {"$ne": None},
@@ -64,7 +58,6 @@ def tickets_exceeded_sla(payload=Depends(verify_token), filtro: Filtro = ""):
             }
         }
     ]
-    print("Filtro final para consulta:", query_filter)
 
     result = list(collection.aggregate(pipeline))
 

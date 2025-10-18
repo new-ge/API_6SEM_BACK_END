@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
-from api_6sem_back_end.db.db_configuration import db
+from api_6sem_back_end.db.db_configuration import db_data
 from api_6sem_back_end.utils.query_filter import build_query_filter, Filtro
 from api_6sem_back_end.repositories.repository_login_security import verify_token
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
-collection = db["tickets"]
+collection = db_data["tickets"]
 
 @router.post("/recurring-tickets")
 def recurring_tickets(payload=Depends(verify_token), filtro: Filtro = ""):
