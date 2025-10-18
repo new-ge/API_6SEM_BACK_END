@@ -37,7 +37,7 @@ app.include_router(router_login.router)
 
 @app.get("/")
 def auto_login():
-    token = validate_login(os.getenv("USERNAME_N2"), os.getenv("PASSWORD_N2"))
+    token = validate_login(os.getenv("USERNAME_GESTOR"), os.getenv("PASSWORD_GESTOR"))
     if token:
         return {"token": token}
     return {"error": "Não foi possível gerar token"}
