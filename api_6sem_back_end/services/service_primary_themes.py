@@ -1,9 +1,9 @@
-from api_6sem_back_end.db.db_configuration import db
+from api_6sem_back_end.db.db_configuration import db_data
 from api_6sem_back_end.utils.query_filter import build_query_filter, Filtro
 
-collection = db["tickets"]
+collection = db_data["tickets"]
 
-class TicketService:
+class ServicePrimaryThemes:
     @staticmethod
     def count_tickets_by_category(filtro: Filtro):
         query_filter = build_query_filter(filtro)
