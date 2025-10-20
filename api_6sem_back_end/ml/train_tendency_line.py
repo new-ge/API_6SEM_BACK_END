@@ -28,7 +28,7 @@ def create_prophet_instance():
     return model
 
 
-def train_model(filtro: Filtro, train_until: str):
+def train_model(filtro: Filtro = None, train_until: str = None):
     if not hasattr(store, "prophet_cache") or not isinstance(store.prophet_cache, dict):
         store.prophet_cache = LRUCache(maxsize=3)
 
