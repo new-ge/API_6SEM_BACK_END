@@ -1,15 +1,28 @@
 from api_6sem_back_end.db.db_configuration import db_data
 from api_6sem_back_end.utils.query_filter import build_query_filter, Filtro
+from datetime import datetime
 
 collection = db_data["tickets"]
 
 class ServiceTicketsByMonth:
     @staticmethod
-    def count_tickets_by_month(filtro: Filtro):
-        query_filter = build_query_filter(filtro)
+    def count_tickets_by_month(filtro: Filtro, role: str):
+        base_filter = build_query_filter(filtro)
+        if (role != "Gestor"):
+            levels_map = {
+                "N1": ["N1"],
+                "N2": ["N1", "N2"],
+                "N3": ["N1", "N2", "N3"]
+            }
+
+            allowed_levels = levels_map.get(role.upper(), [])
+
+            base_filter = {
+                "access_level": {"$in": allowed_levels}
+            }
 
         pipeline = [
-            {"$match": query_filter},
+            {"$match": base_filter},
             {
                 "$group": {
                     "_id": {"$month": "$created_at"},
@@ -31,6 +44,7 @@ class ServiceTicketsByMonth:
             },
             {"$sort": {"month": 1}}
         ]
+
 
         result = list(collection.aggregate(pipeline))
         return {doc["month"]: doc["count"] for doc in result}
