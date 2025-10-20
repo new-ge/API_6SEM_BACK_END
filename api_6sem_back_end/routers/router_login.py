@@ -7,8 +7,6 @@ collection = db_data["users"]
 
 @router.post("/validate-login")
 def validate_login(username, password):
-    print(username)
-    print(password)
     try:
         if username == "" and password == "":
             return None

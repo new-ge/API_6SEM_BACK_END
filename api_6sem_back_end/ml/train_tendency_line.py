@@ -28,11 +28,11 @@ def create_prophet_instance():
     return model
 
 
-def train_model(filtro: Filtro = None, train_until: str = None, custom_filter=None):
+def train_model(filtro: Filtro, train_until: str):
     if not hasattr(store, "prophet_cache") or not isinstance(store.prophet_cache, dict):
         store.prophet_cache = LRUCache(maxsize=3)
 
-    query_filter = custom_filter or build_query_filter(filtro)
+    query_filter = build_query_filter(filtro)
     cache_key = json.dumps(query_filter, sort_keys=True, default=json_serializer)
 
     if cache_key in store.prophet_cache:

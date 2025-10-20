@@ -17,10 +17,7 @@ class ServiceTicketsByMonth:
 
             allowed_levels = levels_map.get(role.upper(), [])
 
-            print(allowed_levels)
-
             base_filter = {
-                "closed_at": None,
                 "access_level": {"$in": allowed_levels}
             }
 
@@ -62,8 +59,6 @@ class ServiceTicketsByMonth:
         }
 
         allowed_levels = levels_map.get(user_level.upper(), [])
-
-        print(allowed_levels)
 
         query_filter = {
             "closed_at": None,
