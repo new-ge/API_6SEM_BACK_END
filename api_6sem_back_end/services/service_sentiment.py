@@ -5,11 +5,24 @@ collection = db_data["tickets"]
 
 class ServiceSentiment:
     @staticmethod
-    def count_tickets_by_sentiment(filtro: Filtro, include_positive: bool):
-        query_filter = build_query_filter(filtro)
+    def count_tickets_by_sentiment(filtro: Filtro, include_positive: bool, role: str):
+        base_filter = build_query_filter(filtro)
+
+        if (role != "Gestor"):
+            levels_map = {
+                "N1": ["N1"],
+                "N2": ["N1", "N2"],
+                "N3": ["N1", "N2", "N3"]
+            }
+
+            allowed_levels = levels_map.get(role.upper(), [])
+
+            base_filter = {
+                "access_level": {"$in": allowed_levels}
+            }
 
         pipeline = [
-            {"$match": query_filter},
+            {"$match": base_filter},
             {
                 "$group": {
                     "_id": "$sentiment",

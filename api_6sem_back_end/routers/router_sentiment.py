@@ -14,4 +14,4 @@ def classify_sentiment(
     filtro: Filtro = "",
     include_positive: Optional[bool] = Query(True)
 ):
-    return ServiceSentiment.count_tickets_by_sentiment(filtro, include_positive)
+    return ServiceSentiment.count_tickets_by_sentiment(filtro, include_positive, payload.get("role"))
