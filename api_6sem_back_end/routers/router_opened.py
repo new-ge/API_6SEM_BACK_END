@@ -10,6 +10,20 @@ collection.create_index("closed_at")
 @router.post("/opened/count")
 def count_opened_tickets(payload=Depends(verify_token), filtro: Filtro = ""):
     base_filter = {"closed_at": {"$in": [None]}}
+    
+    if (payload.get("role") != "Gestor"):
+        levels_map = {
+            "N1": ["N1"],
+            "N2": ["N1", "N2"],
+            "N3": ["N1", "N2", "N3"]
+        }
+
+        allowed_levels = levels_map.get(payload.get("role").upper())
+
+        base_filter = {
+            "closed_at": {"$in": [None]},
+            "access_level": {"$in": allowed_levels}
+        }
 
     query_filter = build_query_filter(filtro, base_filter)
 
