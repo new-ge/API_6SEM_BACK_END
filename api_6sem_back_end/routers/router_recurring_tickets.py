@@ -8,21 +8,19 @@ collection = db_data["tickets"]
 
 @router.post("/recurring-tickets")
 def recurring_tickets(payload=Depends(verify_token), filtro: Filtro = ""):
-    base_filter = {"closed_at": {"$ne": None}}
 
-    if payload["role"].upper() == "GESTOR":
-        allowed_levels = ["N1", "N2", "N3"]
-    else:
+    role = payload["role"].upper()
+    
+    if role != "GESTOR":  
         levels_map = {
             "N1": ["N1"],
             "N2": ["N1", "N2"],
             "N3": ["N1", "N2", "N3"]
         }
-        allowed_levels = levels_map.get(payload["role"].upper(), [])
-
-    base_filter = {
-        "access_level": {"$in": allowed_levels}
-    }
+        allowed_levels = levels_map.get(role, [])
+        base_filter = {"access_level": {"$in": allowed_levels}}
+    else:
+        base_filter = {"access_level": {"$in": ["N1", "N2", "N3"]}}
 
     query_filter = build_query_filter(filtro, base_filter)
 
