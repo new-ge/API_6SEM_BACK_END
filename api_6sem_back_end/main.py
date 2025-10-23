@@ -32,10 +32,3 @@ app.include_router(router_recurring_tickets.router)
 app.include_router(router_sentiment.router)
 app.include_router(router_primary_themes.router)
 app.include_router(router_simulate_login.router)
-
-# @app.get("/")
-# def auto_login():
-#     token = validate_login(os.getenv("USERNAME_N3"), os.getenv("PASSWORD_N3"))
-#     if token:
-#         return {"token": token}
-#     return {"error": "Não foi possível gerar token"}
