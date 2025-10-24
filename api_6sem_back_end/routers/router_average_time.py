@@ -20,7 +20,7 @@ def average_time_closed_tickets(payload=Depends(verify_token), filtro: Filtro = 
         if user_access in levels_hierarchy:
             idx = levels_hierarchy.index(user_access)
             allowed_levels = levels_hierarchy[: idx + 1]
-            base_filter["role"] = {"$in": allowed_levels}
+            base_filter["access_level"] = {"$in": allowed_levels}
 
     query_filter = build_query_filter(filtro, base_filter)
 

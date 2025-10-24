@@ -8,7 +8,6 @@ collection = db_data["tickets"]
 
 @router.post("/recurring-tickets")
 def recurring_tickets(payload=Depends(verify_token), filtro: Filtro = ""):
-
     role = payload["role"].upper()
     
     if role != "GESTOR":  
@@ -19,10 +18,11 @@ def recurring_tickets(payload=Depends(verify_token), filtro: Filtro = ""):
         }
         allowed_levels = levels_map.get(role, [])
         base_filter = {"access_level": {"$in": allowed_levels}}
-    else:
-        base_filter = {"access_level": {"$in": ["N1", "N2", "N3"]}}
 
-    query_filter = build_query_filter(filtro, base_filter)
+        query_filter = build_query_filter(filtro, base_filter)
+            
+    else:
+        query_filter = build_query_filter(filtro)
 
     pipeline = [
     { "$match": query_filter },

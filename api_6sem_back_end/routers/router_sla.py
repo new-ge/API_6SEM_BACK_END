@@ -23,9 +23,12 @@ def tickets_exceeded_sla(payload=Depends(verify_token), filtro: Filtro = ""):
             "closed_at": {"$ne": None},
             "access_level": {"$in": allowed_levels}
         }
-    
-    query_filter = build_query_filter(filtro, base_filter)
 
+        query_filter = build_query_filter(filtro, base_filter)
+            
+    else:
+        query_filter = build_query_filter(filtro)
+    
     pipeline = [
         {"$match": query_filter},
         {

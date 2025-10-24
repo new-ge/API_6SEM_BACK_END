@@ -7,7 +7,6 @@ collection = db_data["tickets"]
 class ServiceTicketsByMonth:
     @staticmethod
     def count_tickets_by_month(filtro: Filtro, role: str):
-        base_filter = build_query_filter(filtro)
         if (role != "Gestor"):
             levels_map = {
                 "N1": ["N1"],
@@ -21,8 +20,13 @@ class ServiceTicketsByMonth:
                 "access_level": {"$in": allowed_levels}
             }
 
+            query_filter = build_query_filter(filtro, base_filter)
+            
+        else:
+            query_filter = build_query_filter(filtro)
+
         pipeline = [
-            {"$match": base_filter},
+            {"$match": query_filter},
             {
                 "$group": {
                     "_id": {"$month": "$created_at"},
@@ -48,25 +52,3 @@ class ServiceTicketsByMonth:
 
         result = list(collection.aggregate(pipeline))
         return {doc["month"]: doc["count"] for doc in result}
-
-    @staticmethod
-    def get_open_tickets_volume_by_level(user_level: str):
-
-        levels_map = {
-            "N1": ["N1"],
-            "N2": ["N1", "N2"],
-            "N3": ["N1", "N2", "N3"]
-        }
-
-        allowed_levels = levels_map.get(user_level.upper(), [])
-
-        query_filter = {
-            "closed_at": None,
-            "access_level": {"$in": allowed_levels}
-        }
-
-        volume = collection.count_documents(query_filter)
-
-        return {
-            "volume": volume
-        }
