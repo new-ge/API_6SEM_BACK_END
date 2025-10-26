@@ -1,6 +1,5 @@
 import os
 from api_6sem_back_end.db.db_configuration import db_connection_sql_server, db_data
-from api_6sem_back_end.db.de import db_data
 import datetime
 from flair.models import TextClassifier
 from flair.data import Sentence

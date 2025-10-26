@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends
 from api_6sem_back_end.services.service_primary_themes import ServicePrimaryThemes
 from api_6sem_back_end.utils.query_filter import Filtro
 from api_6sem_back_end.repositories.repository_login_security import verify_token
-from api_6sem_back_end.db.de import db_data
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 
