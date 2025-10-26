@@ -1,6 +1,5 @@
 from api_6sem_back_end.db.db_configuration import db_data
 from api_6sem_back_end.utils.query_filter import build_query_filter, Filtro
-from datetime import datetime
 
 collection = db_data["tickets"]
 
