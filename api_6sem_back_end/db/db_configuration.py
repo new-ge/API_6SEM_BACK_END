@@ -5,8 +5,7 @@ from dotenv import load_dotenv
 import glob
 
 dotenv_path = glob.glob(os.path.join(os.path.dirname(__file__), "..", "*.env"))
-load_dotenv(dotenv_path[0])
-
+load_dotenv()
 def db_connection_sql_server(url_driver: str, server: str, db_name: str):
     conn_str = (
         f"DRIVER={{{url_driver}}};"
@@ -40,5 +39,6 @@ def db_connection_mongo(url_mongo: str, db_name: str):
         return None
     
 db_data = db_connection_mongo(os.getenv("DB_URL_MONGO"), os.getenv("DB_MONGO"))
-db_deleted = db_connection_mongo(os.getenv("DB_URL_MONGO"), os.getenv("DB_MONGO_2"))
+
+#db_deleted = db_connection_mongo(os.getenv("DB_URL_MONGO"), os.getenv("DB_MONGO_2"))
 

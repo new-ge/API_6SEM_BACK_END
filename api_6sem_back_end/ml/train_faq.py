@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
-
+from api_6sem_back_end.db.de import db_data
 from colorama import Fore, Style, init
 init(autoreset=True) # Inicializa o colorama para reset automático
 

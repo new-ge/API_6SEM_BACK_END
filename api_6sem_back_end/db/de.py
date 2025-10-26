@@ -2,11 +2,13 @@ import pyodbc
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
-import glob
 
-dotenv_path = glob.glob(os.path.join(os.path.dirname(__file__), "..", "*.env"))
-load_dotenv(dotenv_path[0])
+# Carrega o .env da raiz do projeto
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "a.env"))
 
+# -----------------------------
+# Conexão com SQL Server
+# -----------------------------
 def db_connection_sql_server(url_driver: str, server: str, db_name: str):
     conn_str = (
         f"DRIVER={{{url_driver}}};"
@@ -16,41 +18,38 @@ def db_connection_sql_server(url_driver: str, server: str, db_name: str):
     )
     try:
         conn = pyodbc.connect(conn_str)
-        print("Conexão bem-sucedida!")
+        print("✅ Conexão SQL Server bem-sucedida!")
         return conn
     except Exception as e:
-        print("Erro na conexão:", e)
+        print("❌ Erro na conexão SQL Server:", e)
         return None
 
-def db_connection_mongo(url_mongo: str):
-    uri = url_mongo
+# -----------------------------
+# Conexão com MongoDB
+# -----------------------------
+def db_connection_mongo(url_mongo: str, db_name: str):
+    if not url_mongo or not db_name:
+        raise RuntimeError("❌ DB_URL_MONGO ou DB_MONGO não definidos no .env")
     try:
         client = MongoClient(
-            uri,
-            serverSelectionTimeoutMS=99999999,
-            connectTimeoutMS=None,
-            socketTimeoutMS=None,
+            url_mongo,
+            serverSelectionTimeoutMS=10000,
             tls=True
         )
-        print("Conexão bem-sucedida!")
-        db = client[os.getenv("DB_MONGO")]
-        return db
+        print("✅ Conexão MongoDB bem-sucedida!")
+        return client[db_name]
     except Exception as e:
-        print("Erro na conexão:", e)
+        print("❌ Erro na conexão MongoDB:", e)
         return None
 
-# Realiza a conexão MongoDB
-db = db_connection_mongo(os.getenv("DB_URL_MONGO"))
+# -----------------------------
+# Instâncias globais
+# -----------------------------
+DB_URL_MONGO = os.getenv("DB_URL_MONGO")
+DB_MONGO = os.getenv("DB_MONGO", "bd6sem-luminia")  # fallback se não achar no .env
 
-# Exemplo de verificação da coleção
-if db is not None:  # Compare explicitamente com None
-    try:
-        # Suponha que você tenha uma coleção chamada 'tickets'
-        tickets_collection = db["tickets"]
-        # Listar alguns documentos da coleção
-        for ticket in tickets_collection.find().limit(5):
-            print(ticket)
-    except Exception as e:
-        print("Erro ao acessar a coleção:", e)
-else:
-    print("Erro: Não foi possível conectar ao banco de dados MongoDB.")
+db_data = db_connection_mongo(DB_URL_MONGO, DB_MONGO)
+
+# Se quiser validar logo na inicialização:
+if db_data is None:
+    raise RuntimeError("❌ Não foi possível inicializar a conexão com o MongoDB")

@@ -15,10 +15,11 @@ from sklearn.metrics import classification_report, confusion_matrix, f1_score
 from sklearn.preprocessing import LabelEncoder
 from colorama import Fore, Style, init
 from sentence_transformers import SentenceTransformer
-
+from api_6sem_back_end.db.de import db_data
 # Ajuste de caminho para importar módulo local
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from api_6sem_back_end.db.db_configuration import db
+
 
 # ---------------------- [1] Conexão com o MongoDB ---------------------- #
 print(f"\n{Fore.YELLOW}{'='*60}")

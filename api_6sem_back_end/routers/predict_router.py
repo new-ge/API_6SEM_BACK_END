@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 from api_6sem_back_end.ml.faq_inference import search_similar_questions
+from api_6sem_back_end.db.de import db_data
 
 
 # ---------------------- [1] Pré-processamento (igual ao treinamento) ---------------------- #

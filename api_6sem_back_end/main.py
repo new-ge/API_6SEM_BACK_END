@@ -4,11 +4,13 @@ from api_6sem_back_end.routers import router_opened, router_average_time, router
 from api_6sem_back_end.routers.router_login import validate_login
 import os
 from dotenv import load_dotenv
-import glob
+import os
 
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "a.env"))
+print("DB_URL_MONGO:", os.getenv("DB_URL_MONGO"))
+print("DB_MONGO:", os.getenv("DB_MONGO"))
+print("KEY_JWT:", os.getenv("KEY_JWT"))
 
-dotenv_path = glob.glob(os.path.join(os.path.dirname(__file__), "*.env"))
-load_dotenv(dotenv_path[0])
 
 app = FastAPI()
 
@@ -39,4 +41,5 @@ app.include_router(router_simulate_login.router)
 @app.get("/")
 async def root():
     return {"mensagem": "API está rodando! Use /docs para explorar os endpoints."}
+
 

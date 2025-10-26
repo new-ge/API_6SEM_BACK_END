@@ -7,10 +7,9 @@ import jwt
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 dotenv_path = glob.glob(os.path.join(os.path.dirname(__file__), "*.env"))
-load_dotenv(dotenv_path[0])
-
+load_dotenv()
 security = HTTPBearer()
-SECRET_KEY = os.getenv("KEY_JWT")
+SECRET_KEY = os.getenv("KEY_JWT", "chave_padrao_segura")
 
 def create_jwt_token(username, role):
     payload = {
@@ -31,3 +30,4 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
         raise HTTPException(status_code=401, detail="Token expirado")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Token inválido")
+    

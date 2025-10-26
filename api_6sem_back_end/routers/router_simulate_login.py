@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 from api_6sem_back_end.repositories.repository_login_security import create_jwt_token
+from api_6sem_back_end.db.de import db_data
 
 router = APIRouter(prefix="/login", tags=["Login"])
 

@@ -6,6 +6,7 @@ from pymongo import MongoClient
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
+from api_6sem_back_end.db.de import db_data
 
 # ---------------------- [1] Conexão MongoDB ---------------------- #
 MONGO_URL = os.getenv("DB_URL_MONGO")

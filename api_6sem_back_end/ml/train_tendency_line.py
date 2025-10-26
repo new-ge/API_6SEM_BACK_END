@@ -6,6 +6,7 @@ from prophet import Prophet
 from api_6sem_back_end.db.db_configuration import db_data
 from api_6sem_back_end.utils.query_filter import Filtro, build_query_filter
 import api_6sem_back_end.models.model_store as store
+from api_6sem_back_end.db.de import db_data
 
 collection = db_data["tickets"]
 collection.create_index("created_at")
