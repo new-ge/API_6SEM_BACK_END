@@ -3,11 +3,11 @@ import json
 from cachetools import LRUCache
 import pandas as pd
 from prophet import Prophet
-from api_6sem_back_end.db.db_configuration import db
+from api_6sem_back_end.db.db_configuration import db_data
 from api_6sem_back_end.utils.query_filter import Filtro, build_query_filter
 import api_6sem_back_end.models.model_store as store
 
-collection = db["tickets"]
+collection = db_data["tickets"]
 collection.create_index("created_at")
 
 def json_serializer(obj):
@@ -68,6 +68,9 @@ def train_model(filtro: Filtro = None, train_until: str = None):
         cursor = collection.aggregate(pipeline)
         df_grouped = pd.DataFrame.from_records(cursor)
 
+        if df_grouped.empty:
+            return None, None
+
         df_grouped["ds"] = pd.to_datetime(df_grouped["ds"])
         df_grouped = df_grouped.sort_values("ds").reset_index(drop=True)
 
@@ -77,11 +80,9 @@ def train_model(filtro: Filtro = None, train_until: str = None):
         df_grouped = df_grouped[df_grouped["ds"] <= pd.to_datetime(train_until)]
 
     model = create_prophet_instance()
-
     model.fit(df_grouped)
 
     return model, df_grouped
-
 
 def get_model():
     return store.prophet_cache
