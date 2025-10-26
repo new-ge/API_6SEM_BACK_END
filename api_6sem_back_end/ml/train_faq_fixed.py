@@ -224,3 +224,8 @@ print(f"{Fore.CYAN}map_to_theme: {Fore.WHITE}{map_to_theme(sample_question)}")
 print(f"{Fore.CYAN}Modelo predito: {Fore.WHITE}{classify_text(sample_question)}\n")
 
 print(f"{Fore.GREEN}Script finalizado com sucesso usando SentenceTransformer.")
+
+
+print("O que eu fiz até o momento: Um modelo SentenceTransformer salvo em artifacts/faq_sentence_transformer")
+print("Uma collection faq no MongoDB com campos Question e")
+print("Answer e Função preprocess_text() para limpeza dos textos")

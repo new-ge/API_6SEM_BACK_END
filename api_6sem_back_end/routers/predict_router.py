@@ -1,15 +1,17 @@
 import os
 import re
 import joblib
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
+from api_6sem_back_end.ml.faq_inference import search_similar_questions
+
 
 # ---------------------- [1] Pré-processamento (igual ao treinamento) ---------------------- #
 def preprocess_text(text: str) -> str:
     text = str(text).lower()
     text = re.sub(r'[^\w\s]', ' ', text)        # remove pontuação
-    text = re.sub(r'\s+', ' ', text).strip()    # colapsa espaços
+    text = re.sub(r'\s+', ' ', text).strip()    # remove espaços extras
     return text
 
 # ---------------------- [2] Carregamento dos Artefatos ---------------------- #
@@ -82,7 +84,7 @@ def predict_topic_from_answer(request: AnswerRequest):
         "message": "Predição baseada em embeddings semânticos (SentenceTransformer)."
     }
 
-# ---------------------- [7] Endpoint Opcional: Teste de Saúde ---------------------- #
+# ---------------------- [7] Endpoint: Teste de Saúde ---------------------- #
 @router.get("/healthcheck")
 def health_check():
     status = {
@@ -95,3 +97,12 @@ def health_check():
         return {"status": "ok", "details": status}
     else:
         raise HTTPException(status_code=500, detail=status)
+
+# ---------------------- [8] Endpoint: Busca de Perguntas Semelhantes ---------------------- #
+@router.get("/search")
+def search_faq(question: str = Query(..., description="Pergunta do usuário")):
+    try:
+        results = search_similar_questions(question)
+        return {"query": question, "results": results}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
