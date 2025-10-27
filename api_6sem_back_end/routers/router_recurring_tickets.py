@@ -1,13 +1,28 @@
-from fastapi import APIRouter
-from api_6sem_back_end.db.db_configuration import db
+from fastapi import APIRouter, Depends
+from api_6sem_back_end.db.db_configuration import db_data
 from api_6sem_back_end.utils.query_filter import build_query_filter, Filtro
+from api_6sem_back_end.repositories.repository_login_security import verify_token
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
-collection = db["tickets"]
+collection = db_data["tickets"]
 
 @router.post("/recurring-tickets")
-def recurring_tickets(filtro: Filtro):
-    query_filter = build_query_filter(filtro)
+def recurring_tickets(payload=Depends(verify_token), filtro: Filtro = ""):
+    role = payload["role"].upper()
+    
+    if role != "GESTOR":  
+        levels_map = {
+            "N1": ["N1"],
+            "N2": ["N1", "N2"],
+            "N3": ["N1", "N2", "N3"]
+        }
+        allowed_levels = levels_map.get(role, [])
+        base_filter = {"access_level": {"$in": allowed_levels}}
+
+        query_filter = build_query_filter(filtro, base_filter)
+            
+    else:
+        query_filter = build_query_filter(filtro)
 
     pipeline = [
     { "$match": query_filter },
