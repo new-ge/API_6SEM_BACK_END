@@ -1,8 +1,10 @@
 from glob import glob
+import threading
 from fastapi import FastAPI
+from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
+from api_6sem_back_end.db.db_mongo_manipulate_data import monitorar_backup
 from api_6sem_back_end.routers import router_opened, router_average_time, router_by_period, router_predict_faq, router_simulate_login, router_sla, router_recurring_tickets, router_primary_themes, router_sentiment
-from api_6sem_back_end.routers.router_login import validate_login
 import os
 from dotenv import load_dotenv
 import os
@@ -10,12 +12,19 @@ import os
 dotenv_path = glob(os.path.join(os.path.dirname(__file__), "*.env"))
 load_dotenv(dotenv_path[0])
 
-app = FastAPI()
-
 allow_origins = [
     "http://localhost:5173",
     "https://localhost:5173",
 ]
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    thread = threading.Thread(target=monitorar_backup, daemon=True)
+    thread.start()
+    print("Thread de monitoramento iniciada.")
+    yield 
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,5 +48,3 @@ app.include_router(router_simulate_login.router)
 @app.get("/")
 async def root():
     return {"mensagem": "API está rodando! Use /docs para explorar os endpoints."}
-
-

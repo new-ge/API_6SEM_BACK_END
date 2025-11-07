@@ -1,9 +1,9 @@
 from fastapi import APIRouter
-from api_6sem_back_end.db.db_configuration import db_data
-from api_6sem_back_end.repositories.repository_login_security import create_jwt_token, verify_token
+from api_6sem_back_end.db.db_configuration import MongoConnection
+from api_6sem_back_end.repositories.repository_login_security import create_jwt_token
 
 router = APIRouter(prefix="/login", tags=["Login"])
-collection = db_data["users"]
+collection = MongoConnection.get_db("bd6sem-luminia")["users"]
 
 @router.post("/validate-login")
 def validate_login(username, password):

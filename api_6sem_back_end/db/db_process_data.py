@@ -1,5 +1,5 @@
 import os
-from api_6sem_back_end.db.db_configuration import db_connection_sql_server, db_data
+from api_6sem_back_end.db.db_configuration import MongoConnection, db_connection_sql_server
 import datetime
 from flair.models import TextClassifier
 from flair.data import Sentence
@@ -114,7 +114,9 @@ def create_collections_mongo_db(all_tables):
             "login": {
                 "username": "",
                 "password": ""
-            }
+            },
+            "modified_at": datetime.now(datetime.timezone(datetime.timedelta(hours=-3))).isoformat(timespec='seconds'),
+            "created_at": datetime.now(datetime.timezone(datetime.timedelta(hours=-3))).isoformat(timespec='seconds')
         }
         users_docs.append(user_collection)
 
@@ -158,9 +160,9 @@ def create_collections_mongo_db(all_tables):
 
 def save_on_mongo_db_collections(**collections_docs):
     for collection_name in collections_docs.keys():
-        db_data[collection_name].create_index("agent_id", unique=True, sparse=True)
-        db_data[collection_name].create_index("audit_id", unique=True, sparse=True)
-        db_data[collection_name].create_index("ticket_id", unique=True, sparse=True)
+        MongoConnection.get_db("bd6sem-luminia")[collection_name].create_index("agent_id", unique=True, sparse=True)
+        MongoConnection.get_db("bd6sem-luminia")[collection_name].create_index("audit_id", unique=True, sparse=True)
+        MongoConnection.get_db("bd6sem-luminia")[collection_name].create_index("ticket_id", unique=True, sparse=True)
 
     for collection_name, docs in collections_docs.items():
         if not docs:
@@ -187,7 +189,7 @@ def save_on_mongo_db_collections(**collections_docs):
 
         if operations:
             try:
-                result = db_data[collection_name].bulk_write(operations, ordered=False)
+                result = MongoConnection.get_db("bd6sem-luminia")[collection_name].bulk_write(operations, ordered=False)
 
                 print(
                     f"[{collection_name}] "

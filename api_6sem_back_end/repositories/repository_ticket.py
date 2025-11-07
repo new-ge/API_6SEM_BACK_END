@@ -1,6 +1,6 @@
-from api_6sem_back_end.db.db_configuration import db_data
+from api_6sem_back_end.db.db_configuration import MongoConnection
 
-collection = db_data["tickets"]
+collection = MongoConnection.get_db("bd6sem-luminia")["tickets"]
 
 class TicketRepository:
     @staticmethod
