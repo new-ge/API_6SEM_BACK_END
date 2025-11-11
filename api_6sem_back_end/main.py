@@ -1,7 +1,7 @@
 from glob import glob
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api_6sem_back_end.routers import router_opened, router_average_time, router_by_period, router_predict_faq, router_simulate_login, router_sla, router_recurring_tickets, router_primary_themes, router_sentiment
+from api_6sem_back_end.routers import router_opened, router_average_time, router_by_period, router_predict_faq, router_simulate_login, router_sla, router_recurring_tickets, router_primary_themes, router_sentiment, user_router
 from api_6sem_back_end.routers.router_login import validate_login
 import os
 from dotenv import load_dotenv
@@ -35,6 +35,7 @@ app.include_router(router_primary_themes.router)
 app.include_router(router_sentiment.router)
 app.include_router(router_predict_faq.router)
 app.include_router(router_simulate_login.router)
+app.include_router(user_router.router)
 
 @app.get("/")
 async def root():
