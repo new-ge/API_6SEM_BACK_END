@@ -3,13 +3,11 @@ from api_6sem_back_end.db.db_mongo_manipulate_data import collection_users
 
 router = APIRouter(prefix="/user", tags=["User"])
 
-
 @router.get("/find")
 def find_user(
     email: str = Query(None, description="E-mail do usuário"),
     name: str = Query(None, description="Nome do usuário")
 ):
-    
     
     filtro = {}
     if email:
@@ -19,7 +17,6 @@ def find_user(
     else:
         return None  
 
-    
     user = collection_users.find_one(
         filtro,
         {
@@ -30,10 +27,8 @@ def find_user(
         }
     )
 
-    
     if not user:
         return None
-
    
     return {
         "name": user.get("name"),

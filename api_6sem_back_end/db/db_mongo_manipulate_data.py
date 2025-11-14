@@ -20,6 +20,8 @@ def delete_user(id_user: int):
                 "department": None,
                 "email": None,
                 "login": None,
+                "name": None,
+                "role": None,
                 "isActive": False
             }
         }
@@ -38,9 +40,7 @@ def update_user_data(data: dict):
 
     update_fields = {}
     for key, value in data.get("update", {}).items():
-        # Atualiza no subdocumento login
         update_fields[f"login.{key}"] = value
-        # Atualiza também no nível principal se for name ou role
         if key in ["name", "role"]:
             update_fields[key] = value
 
