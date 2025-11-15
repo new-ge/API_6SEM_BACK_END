@@ -4,16 +4,21 @@ from api_6sem_back_end.db.db_configuration import db_deleted, db_data
 collection_deleted_users = db_deleted["deleted-users"]
 collection_users = db_data["users"]
 
-def delete_user(id_user: int):
-    delete_user_doc = {
-        "id_user": id_user,
-        "timestamp": datetime.now(timezone(timedelta(hours=-3))).isoformat(timespec='seconds')
-    }
+def delete_users(agent_ids: list[int]):
 
-    collection_deleted_users.insert_one(delete_user_doc)
+    timestamp = datetime.now(timezone(timedelta(hours=-3))).isoformat(timespec='seconds')
 
-    collection_users.update_one(
-        {"agent_id": id_user},
+    deleted_docs = []
+    for agent_id in agent_ids:
+        deleted_docs.append({
+            "agent_id": agent_id,
+            "timestamp": timestamp
+        })
+
+    collection_deleted_users.insert_many(deleted_docs)
+
+    collection_users.update_many(
+        {"agent_id": {"$in": agent_ids}},
         {
             "$set": {
                 "department": None,
@@ -21,7 +26,8 @@ def delete_user(id_user: int):
                 "login": None,
                 "name": None,
                 "role": None,
-                "isActive": False
+                "isActive": False,
+                "modified_at": timestamp
             }
         }
     )
