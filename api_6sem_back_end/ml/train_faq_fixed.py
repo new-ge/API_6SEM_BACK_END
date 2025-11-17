@@ -10,10 +10,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from colorama import Fore, init
 from sentence_transformers import SentenceTransformer
-from api_6sem_back_end.db.db_configuration import MongoConnection
+from api_6sem_back_end.db.db_configuration import db_data
 
 def train_faq_classifier():
-    collection = MongoConnection.get_db("bd6sem-luminia")["faq"]
+    collection = db_data["faq"]
 
     init(autoreset=True)  
 

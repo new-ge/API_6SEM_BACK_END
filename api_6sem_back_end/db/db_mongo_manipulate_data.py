@@ -1,30 +1,39 @@
 from datetime import datetime, time, timedelta, timezone
-import glob
-import os
-from dotenv import load_dotenv
+import threading
 from pymongo import errors
-from api_6sem_back_end.db.db_configuration import MongoConnection
+from api_6sem_back_end.db.db_configuration import db_data, db_deleted, db_backup, db_shadow
 
-dotenv_path = glob.glob(os.path.join(os.path.dirname(__file__), "*.env"))
-load_dotenv(dotenv_path[0])
+collection_deleted_users = db_deleted["deleted-users"]
+collection_users = db_data["users"]
+collection_shadow_deleted = db_shadow["deleted-users"]
 
-target_db_name = os.getenv("DB_MONGO_BACKUPS")
-db_principal_name = os.getenv("DB_MONGO")
+def delete_users(agent_ids: list[int]):
+    timestamp = datetime.now(timezone(timedelta(hours=-3))).isoformat(timespec='seconds')
 
-db_principal = MongoConnection.get_db(os.getenv("DB_MONGO"))
-db_deleted = MongoConnection.get_db(os.getenv("DB_MONGO_2"))
-db_backup = MongoConnection.get_db(target_db_name)
+    deleted_docs = []
+    for agent_id in agent_ids:
+        deleted_docs.append({
+            "agent_id": agent_id,
+            "timestamp": timestamp
+        })
 
-def delete_user(id_user: int):
-    delete_user_doc = {
-        "agent_id": id_user,
-        "timestamp": datetime.now(timezone(timedelta(hours=-3))).isoformat(timespec='seconds')
-    }
+    collection_deleted_users.insert_many(deleted_docs)
 
-    db_deleted["deleted-users"].insert_one(delete_user_doc)
+    collection_shadow_deleted.insert_many(deleted_docs)
 
-    db_principal["users"].delete_one(
-        {"agent_id": id_user}
+    collection_users.update_many(
+        {"agent_id": {"$in": agent_ids}},
+        {
+            "$set": {
+                "department": None,
+                "email": None,
+                "login": None,
+                "name": None,
+                "role": None,
+                "isActive": False,
+                "modified_at": timestamp
+            }
+        }
     )
 
 def ao_detectar_banco() -> bool:
@@ -39,7 +48,7 @@ def ao_detectar_banco() -> bool:
         return False
 
     try:
-        db_principal["users"].insert_many(docs_para_inserir, ordered=False)
+        db_data["users"].insert_many(docs_para_inserir, ordered=False)
         print(f"Inseridos {len(docs_para_inserir)} documentos na base principal.")
     except errors.BulkWriteError as e:
         duplicated = [err for err in e.details["writeErrors"] if err["code"] == 11000]
@@ -57,9 +66,9 @@ def monitorar_backup():
         print(f"Detectados {len(backups_existentes)} backups existentes. Processando...")
         inserted = ao_detectar_banco()
         if inserted:
-            MongoConnection.get_client().drop_database(target_db_name)
-            print(f"Database '{target_db_name}' apagado após processar backups existentes.\n")
-    print(f"Monitorando '{target_db_name}.backups' continuamente em tempo real...")
+            db_backup.client.drop_database("backups-luminia")
+            print(f"Database apagado após processar backups existentes.\n")
+    print(f"Monitorando continuamente em tempo real...")
 
     while True:
         try:
@@ -69,9 +78,9 @@ def monitorar_backup():
                         print("\nNovo backup detectado. Processando...")
 
                         inserted = ao_detectar_banco()
-                        if inserted:
-                            MongoConnection.get_client().drop_database(target_db_name)
-                            print(f"Database '{target_db_name}' apagado após processar.")
+                        if inserted:            
+                            db_backup.client.drop_database("backups-luminia")
+                            print(f"Database apagado após processar.")
 
                         print("Reiniciando monitoramento em 3 segundos...\n")
                         time.sleep(3)
@@ -87,3 +96,91 @@ def monitorar_backup():
         except Exception as e:
             print(f"Erro inesperado: {e}")
             time.sleep(5)
+
+def replicate_collection(collection, collection_shadow):
+    try:
+        pipeline = [{"$match": {"operationType": {"$in": ["insert", "update"]}}}]
+        with collection.watch(pipeline, full_document="updateLookup") as stream:
+            for change in stream:
+                op = change["operationType"]
+                doc_id = change["documentKey"]["_id"]
+
+                if op == "insert":
+                    collection_shadow.insert_one(change["fullDocument"])
+                    print(f"[INSERT] Documento {doc_id} replicado no Shadow.")
+                elif op == "update":
+                    updated_fields = change["updateDescription"]["updatedFields"]
+                    collection_shadow.update_one(
+                        {"_id": doc_id},
+                        {"$set": updated_fields},
+                        upsert=True
+                    )
+                    print(f"[UPDATE] Documento {doc_id} sincronizado no Shadow.")
+    except Exception as e:
+        print(f"Erro na thread de {collection.name}: {e}")
+
+def start_shadow_replication(
+    collection_name: str,
+    collection_name_deleted: str
+):
+    collection_main = db_data[collection_name]
+    collection_deleted = db_deleted[collection_name_deleted]
+    collection_shadow = db_shadow[collection_name]
+    collection_shadow_deleted = db_shadow[collection_name_deleted]
+
+    thread_deleted = threading.Thread(
+        target=replicate_collection,
+        args=(collection_deleted, collection_shadow_deleted),
+        daemon=True
+    )
+
+    thread_main = threading.Thread(
+        target=replicate_collection,
+        args=(collection_main, collection_shadow),
+        daemon=True
+    )
+    thread_deleted.start()
+    time.sleep(15)
+    thread_main.start()
+
+    print(thread_deleted)
+
+    print("📡 Shadow Replication iniciada para ativos e deletados.")
+
+def update_user_data(data: dict):
+    filtro = {}
+    if "email" in data:
+        filtro["email"] = data["email"]
+    elif "name" in data:
+        filtro["login.name"] = data["name"]
+    else:
+        print("Nenhum campo de identificação (email/nome) informado.")
+        return None
+
+    update_fields = {}
+    for key, value in data.get("update", {}).items():
+        update_fields[f"login.{key}"] = value
+        if key in ["name", "role"]:
+            update_fields[key] = value
+
+    update_fields["login.modified_at"] = datetime.now(
+        timezone(timedelta(hours=-3))
+    ).isoformat(timespec='seconds')
+
+    print(f"Filtro usado: {filtro}")
+    print(f"Campos para atualizar: {update_fields}")
+
+    result = collection_users.update_one(filtro, {"$set": update_fields})
+
+    print(f"matched_count: {result.matched_count}")
+    print(f"modified_count: {result.modified_count}")
+
+    if result.matched_count == 0:
+        print("Nenhum usuário encontrado com o filtro informado.")
+        return None
+
+    if result.modified_count == 0:
+        print("Nenhum campo foi alterado (valores idênticos?).")
+
+    print("Atualização concluída com sucesso.")
+    return result

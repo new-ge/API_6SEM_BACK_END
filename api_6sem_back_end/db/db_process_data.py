@@ -1,5 +1,5 @@
 import os
-from api_6sem_back_end.db.db_configuration import MongoConnection, db_connection_sql_server
+from api_6sem_back_end.db.db_configuration import db_data, db_connection_sql_server
 import datetime
 from flair.models import TextClassifier
 from flair.data import Sentence
@@ -159,11 +159,6 @@ def create_collections_mongo_db(all_tables):
     return history_docs, tickets_docs, users_docs
 
 def save_on_mongo_db_collections(**collections_docs):
-    for collection_name in collections_docs.keys():
-        MongoConnection.get_db("bd6sem-luminia")[collection_name].create_index("agent_id", unique=True, sparse=True)
-        MongoConnection.get_db("bd6sem-luminia")[collection_name].create_index("audit_id", unique=True, sparse=True)
-        MongoConnection.get_db("bd6sem-luminia")[collection_name].create_index("ticket_id", unique=True, sparse=True)
-
     for collection_name, docs in collections_docs.items():
         if not docs:
             continue
@@ -189,7 +184,7 @@ def save_on_mongo_db_collections(**collections_docs):
 
         if operations:
             try:
-                result = MongoConnection.get_db("bd6sem-luminia")[collection_name].bulk_write(operations, ordered=False)
+                result = db_data[collection_name].bulk_write(operations, ordered=False)
 
                 print(
                     f"[{collection_name}] "

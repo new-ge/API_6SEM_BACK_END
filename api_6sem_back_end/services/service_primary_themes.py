@@ -1,7 +1,7 @@
-from api_6sem_back_end.db.db_configuration import MongoConnection
+from api_6sem_back_end.db.db_configuration import db_data
 from api_6sem_back_end.utils.query_filter import build_query_filter, Filtro
 
-collection = MongoConnection.get_db("bd6sem-luminia")["tickets"]
+collection = db_data["tickets"]
 
 class ServicePrimaryThemes:
     @staticmethod

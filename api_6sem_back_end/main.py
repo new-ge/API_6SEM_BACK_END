@@ -3,8 +3,8 @@ import threading
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-from api_6sem_back_end.db.db_mongo_manipulate_data import monitorar_backup
-from api_6sem_back_end.routers import router_opened, router_average_time, router_by_period, router_predict_faq, router_simulate_login, router_sla, router_recurring_tickets, router_primary_themes, router_sentiment
+from api_6sem_back_end.db.db_mongo_manipulate_data import monitorar_backup, start_shadow_replication
+from api_6sem_back_end.routers import router_get_all_users, router_opened, router_average_time, router_by_period, router_predict_faq, router_simulate_login, router_sla, router_recurring_tickets, router_primary_themes, router_sentiment, user_router, update_router, router_delete_users
 import os
 from dotenv import load_dotenv
 import os
@@ -19,8 +19,10 @@ allow_origins = [
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    thread = threading.Thread(target=monitorar_backup, daemon=True)
-    thread.start()
+    thread1 = threading.Thread(target=monitorar_backup, daemon=True)
+    thread2 = threading.Thread(target=start_shadow_replication, args=("users","deleted_users",), daemon=True)
+    thread1.start()
+    thread2.start()
     print("Thread de monitoramento iniciada.")
     yield 
 
@@ -44,6 +46,10 @@ app.include_router(router_primary_themes.router)
 app.include_router(router_sentiment.router)
 app.include_router(router_predict_faq.router)
 app.include_router(router_simulate_login.router)
+app.include_router(user_router.router)
+app.include_router(update_router.router)
+app.include_router(router_delete_users.router)
+app.include_router(router_get_all_users.router)
 
 @app.get("/")
 async def root():
