@@ -157,11 +157,6 @@ def create_collections_mongo_db(all_tables):
     return history_docs, tickets_docs, users_docs
 
 def save_on_mongo_db_collections(**collections_docs):
-    for collection_name in collections_docs.keys():
-        db_data[collection_name].create_index("agent_id", unique=True, sparse=True)
-        db_data[collection_name].create_index("audit_id", unique=True, sparse=True)
-        db_data[collection_name].create_index("ticket_id", unique=True, sparse=True)
-
     for collection_name, docs in collections_docs.items():
         if not docs:
             continue

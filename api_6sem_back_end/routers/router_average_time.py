@@ -6,7 +6,6 @@ from api_6sem_back_end.utils.query_filter import build_query_filter, Filtro
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 
 collection = db_data["tickets"]
-collection.create_index("closed_at")
 
 @router.post("/closed/average-time")
 def average_time_closed_tickets(payload=Depends(verify_token), filtro: Filtro = ""):
