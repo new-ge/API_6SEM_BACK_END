@@ -7,7 +7,6 @@ collection = db_data["tickets"]
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 collection = db_data["tickets"]
-collection.create_index("closed_at")
 
 @router.post("/opened/count")
 def count_opened_tickets(payload=Depends(verify_token), filtro: Filtro = ""):

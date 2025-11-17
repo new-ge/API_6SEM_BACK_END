@@ -8,7 +8,6 @@ from api_6sem_back_end.utils.query_filter import Filtro, build_query_filter
 import api_6sem_back_end.models.model_store as store
 
 collection = db_data["tickets"]
-collection.create_index("created_at")
 
 def json_serializer(obj):
     if isinstance(obj, datetime):
