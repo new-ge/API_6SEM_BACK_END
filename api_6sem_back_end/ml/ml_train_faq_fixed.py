@@ -7,7 +7,6 @@ import pandas as pd
 from pymongo import MongoClient
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, confusion_matrix, f1_score
 from sklearn.preprocessing import LabelEncoder
 from colorama import Fore, init
 from sentence_transformers import SentenceTransformer
@@ -85,9 +84,9 @@ def train_faq_classifier():
 
     embedder = SentenceTransformer("all-MiniLM-L6-v2")
 
-    print(f"{Fore.CYAN}Gerando embeddings para o conjunto de treinamento...")
+    print(f"Gerando embeddings para o conjunto de treinamento...")
     X_train_vec = embedder.encode(X_train.tolist(), convert_to_numpy=True, show_progress_bar=True)
-    print(f"{Fore.CYAN}Gerando embeddings para o conjunto de teste...")
+    print(f"Gerando embeddings para o conjunto de teste...")
     X_test_vec = embedder.encode(X_test.tolist(), convert_to_numpy=True, show_progress_bar=True)
 
     model = LogisticRegression(max_iter=2000, random_state=42, class_weight="balanced", solver="lbfgs", multi_class="auto")
@@ -108,6 +107,6 @@ def train_faq_classifier():
     joblib.dump(le, le_path)
     embedder.save(embed_path)
 
-    print(f"{Fore.GREEN}✔ Artefatos salvos em: {ARTIFACTS_DIR}")
+    print(f"Artefatos salvos em: {ARTIFACTS_DIR}")
 
     return embedder

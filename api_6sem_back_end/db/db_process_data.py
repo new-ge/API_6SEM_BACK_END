@@ -1,5 +1,5 @@
 import os
-from api_6sem_back_end.db.db_configuration import db_connection_sql_server, db_data
+from api_6sem_back_end.db.db_configuration import db_data, db_connection_sql_server
 import datetime
 from flair.models import TextClassifier
 from flair.data import Sentence
@@ -114,7 +114,9 @@ def create_collections_mongo_db(all_tables):
             "login": {
                 "username": "",
                 "password": ""
-            }
+            },
+            "modified_at": datetime.now(datetime.timezone(datetime.timedelta(hours=-3))).isoformat(timespec='seconds'),
+            "created_at": datetime.now(datetime.timezone(datetime.timedelta(hours=-3))).isoformat(timespec='seconds')
         }
         users_docs.append(user_collection)
 

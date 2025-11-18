@@ -1,9 +1,7 @@
 from fastapi import APIRouter, Depends
-from api_6sem_back_end.db.db_configuration import db_data
-from api_6sem_back_end.utils.query_filter import build_query_filter, Filtro
+from api_6sem_back_end.utils.utils_query_filter import build_query_filter, Filtro
 from api_6sem_back_end.repositories.repository_login_security import verify_token
-
-collection = db_data["tickets"]
+from api_6sem_back_end.db.db_configuration import db_data
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 collection = db_data["tickets"]

@@ -6,21 +6,19 @@ collection = db_data["users"]
 
 @router.get("/get-all-users")
 def get_all_users():
-    cursor = collection.find({}, {"agent_id": 1, "name": 1, "email": 1})
+    cursor = collection.find({}, {"agent_id": 1, "name": 1, "email": 1, "isActive": 1})
     users = []
 
     for doc in cursor:
-
         name = doc.get("name")
         email = doc.get("email")
 
-        if not name or not email:  
-            continue
+        if doc.get("isActive") == True:
 
-        users.append({
-            "id": doc.get("agent_id"),
-            "name": name,
-            "email": email
-        })
+            users.append({
+                "id": doc.get("agent_id"),
+                "name": name,
+                "email": email
+            })
 
     return users

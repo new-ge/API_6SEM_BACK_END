@@ -5,14 +5,14 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 from api_6sem_back_end.db.db_configuration import db_data
-from api_6sem_back_end.ml.train_faq_fixed import train_faq_classifier
+from api_6sem_back_end.ml.ml_train_faq_fixed import train_faq_classifier
 
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "artifacts/faq_sentence_transformer")
 
 if not os.path.exists(MODEL_DIR):
     embedder = train_faq_classifier()
 else:
-    print("[INFO] Carregando modelo existente de:", MODEL_DIR)
+    print("Carregando modelo existente de:", MODEL_DIR)
     embedder = SentenceTransformer(MODEL_DIR)
 
 def preprocess_text(text: str) -> str:
@@ -29,12 +29,12 @@ emb_path = os.path.join(os.path.dirname(__file__), "artifacts/faq_question_embed
 
 if os.path.exists(emb_path):
     faq_embeddings = np.load(emb_path)
-    print("✅ Embeddings das perguntas carregados do cache.")
+    print("Embeddings das perguntas carregados do cache.")
 else:
-    print("⚙️ Gerando embeddings para todas as perguntas da base...")
+    print("Gerando embeddings para todas as perguntas da base...")
     faq_embeddings = embedder.encode(df_faq["Question_clean"].tolist(), convert_to_numpy=True, show_progress_bar=True)
     np.save(emb_path, faq_embeddings)
-    print("✅ Embeddings gerados e salvos.")
+    print("Embeddings gerados e salvos.")
 
 def search_similar_questions(user_question: str, top_k=5):
     q_proc = preprocess_text(user_question)
