@@ -4,7 +4,7 @@ from cachetools import LRUCache
 import pandas as pd
 from prophet import Prophet
 from api_6sem_back_end.db.db_configuration import db_data
-from api_6sem_back_end.utils.query_filter import Filtro, build_query_filter
+from api_6sem_back_end.utils.utils_query_filter import Filtro, build_query_filter
 import api_6sem_back_end.models.model_store as store
 
 collection = db_data["tickets"]

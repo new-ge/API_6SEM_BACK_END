@@ -4,7 +4,7 @@ from api_6sem_back_end.repositories.repository_login_security import verify_toke
 from api_6sem_back_end.services.service_get_forecast import get_forecast
 from api_6sem_back_end.services.service_tickets_by_month import ServiceTicketsByMonth
 from api_6sem_back_end.db.db_configuration import db_data
-from api_6sem_back_end.utils.query_filter import Filtro
+from api_6sem_back_end.utils.utils_query_filter import Filtro
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 collection = db_data["tickets"]

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from api_6sem_back_end.services.update_service import UpdateService
+from api_6sem_back_end.services.service_update_user import UpdateService
 
 router = APIRouter(prefix="/users", tags=["Users"])
 

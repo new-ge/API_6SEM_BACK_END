@@ -10,7 +10,6 @@ def get_all_users():
     users = []
 
     for doc in cursor:
-        print(doc)
         name = doc.get("name")
         email = doc.get("email")
 

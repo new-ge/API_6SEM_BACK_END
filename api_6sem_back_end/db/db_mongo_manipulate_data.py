@@ -41,12 +41,10 @@ def ao_detectar_banco() -> bool:
     docs_para_inserir = list(db_backup["backups"].find({"agent_id": {"$in": db_rest}}))
 
     if not docs_para_inserir:
-        print("Nenhum documento novo para inserir.")
         return False
 
     try:
         db_data["users"].insert_many(docs_para_inserir, ordered=False)
-        print(f"Inseridos {len(docs_para_inserir)} documentos na base principal.")
     except errors.BulkWriteError as e:
         duplicated = [err for err in e.details["writeErrors"] if err["code"] == 11000]
         inserted = len(docs_para_inserir) - len(duplicated)

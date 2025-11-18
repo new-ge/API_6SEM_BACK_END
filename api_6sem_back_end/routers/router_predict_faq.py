@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from api_6sem_back_end.ml.faq_inference import search_similar_questions
+from api_6sem_back_end.ml.ml_faq_inference import search_similar_questions
 from api_6sem_back_end.repositories.repository_login_security import verify_token
 
 router = APIRouter(prefix="/faq", tags=["FAQ Classifier"])
