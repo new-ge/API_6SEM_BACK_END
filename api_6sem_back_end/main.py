@@ -19,10 +19,8 @@ allow_origins = [
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    thread1 = threading.Thread(target=monitorar_backup, daemon=True)
-    thread2 = threading.Thread(target=start_shadow_replication, args=("users","deleted_users",), daemon=True)
-    thread1.start()
-    thread2.start()
+    thread = threading.Thread(target=monitorar_backup, daemon=True)
+    thread.start()
     print("Thread de monitoramento iniciada.")
     yield 
 

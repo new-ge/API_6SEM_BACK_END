@@ -1,11 +1,10 @@
 from datetime import datetime, time, timedelta, timezone
 import threading
 from pymongo import errors
-from api_6sem_back_end.db.db_configuration import db_data, db_deleted, db_backup, db_shadow
+from api_6sem_back_end.db.db_configuration import db_data, db_deleted, db_backup
 
 collection_deleted_users = db_deleted["deleted-users"]
 collection_users = db_data["users"]
-collection_shadow_deleted = db_shadow["deleted-users"]
 
 def delete_users(agent_ids: list[int]):
     timestamp = datetime.now(timezone(timedelta(hours=-3))).isoformat(timespec='seconds')
@@ -18,8 +17,6 @@ def delete_users(agent_ids: list[int]):
         })
 
     collection_deleted_users.insert_many(deleted_docs)
-
-    collection_shadow_deleted.insert_many(deleted_docs)
 
     collection_users.update_many(
         {"agent_id": {"$in": agent_ids}},
@@ -118,34 +115,6 @@ def replicate_collection(collection, collection_shadow):
                     print(f"[UPDATE] Documento {doc_id} sincronizado no Shadow.")
     except Exception as e:
         print(f"Erro na thread de {collection.name}: {e}")
-
-def start_shadow_replication(
-    collection_name: str,
-    collection_name_deleted: str
-):
-    collection_main = db_data[collection_name]
-    collection_deleted = db_deleted[collection_name_deleted]
-    collection_shadow = db_shadow[collection_name]
-    collection_shadow_deleted = db_shadow[collection_name_deleted]
-
-    thread_deleted = threading.Thread(
-        target=replicate_collection,
-        args=(collection_deleted, collection_shadow_deleted),
-        daemon=True
-    )
-
-    thread_main = threading.Thread(
-        target=replicate_collection,
-        args=(collection_main, collection_shadow),
-        daemon=True
-    )
-    thread_deleted.start()
-    time.sleep(15)
-    thread_main.start()
-
-    print(thread_deleted)
-
-    print("📡 Shadow Replication iniciada para ativos e deletados.")
 
 def update_user_data(data: dict):
     filtro = {}

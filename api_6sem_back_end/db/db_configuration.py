@@ -52,5 +52,4 @@ def db_connection_mongo(url_mongo: str, db_name: str):
 
 db_data = db_connection_mongo(os.getenv("DB_URL_MONGO"), os.getenv("DB_MONGO"))
 db_deleted = db_connection_mongo(os.getenv("DB_URL_LGPD"), os.getenv("DB_MONGO_2"))
-db_backup = db_connection_mongo(os.getenv("DB_URL_MONGO"), os.getenv("DB_MONGO_BACKUPS"))
-db_shadow = db_connection_mongo(os.getenv("DB_URL_MONGO"), os.getenv("DB_MONGO_SHADOW"))
+db_backup = db_connection_mongo(os.getenv("DB_URL_BACKUPS"), os.getenv("DB_MONGO_BACKUPS"))
