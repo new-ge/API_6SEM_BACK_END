@@ -3,8 +3,8 @@ import threading
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-from api_6sem_back_end.db.db_mongo_manipulate_data import monitorar_backup, start_shadow_replication
-from api_6sem_back_end.routers import router_find_user, router_get_all_users, router_opened, router_average_time, router_by_period, router_predict_faq, router_simulate_login, router_sla, router_recurring_tickets, router_primary_themes, router_sentiment, router_delete_users, router_update_user
+from api_6sem_back_end.db.db_mongo_manipulate_data import monitorar_backup
+from api_6sem_back_end.routers import router_find_user, router_get_all_users, router_opened, router_average_time, router_by_period, router_predict_faq, router_simulate_login, router_exceeded_sla, router_recurring_tickets, router_primary_themes, router_sentiment, router_delete_users, router_update_user
 import os
 from dotenv import load_dotenv
 import os
@@ -37,7 +37,7 @@ app.add_middleware(
 app.include_router(router_by_period.router)
 app.include_router(router_average_time.router)
 app.include_router(router_opened.router)
-app.include_router(router_sla.router)
+app.include_router(router_exceeded_sla.router)
 app.include_router(router_recurring_tickets.router)
 app.include_router(router_sentiment.router)
 app.include_router(router_primary_themes.router)
