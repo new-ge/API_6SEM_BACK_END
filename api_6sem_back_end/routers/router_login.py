@@ -11,30 +11,32 @@ class LoginRequest(BaseModel):
     password: str
 
 @router.post("/validate-login")
-def validate_login(username, password):
+def validate_login(login_request: LoginRequest):
     try:
-        if username == "" and password == "":
+        if login_request.username == "" and login_request.password == "":
             return None
         else:
             pipeline = [
                 {
                     "$match": {
-                        "login.username": username,
-                        "login.password": password
+                        "login.username": login_request.username,
+                        "login.password": login_request.password
                     }
                 },
                 {
                     "$project": {
                         "_id": 0,
                         "username": {"$getField": {"field": "username", "input": "$login"}},
-                        "role": "$role"
+                        "role": "$role",
+                        "name": "$name"
                     }
                 }
               ]
             result = list(collection.aggregate(pipeline))
             if result:
                 token = create_jwt_token(result[0]["username"], result[0]["role"])
-                return token
+                role = result[0]["role"]
+                return {"token": token, "role": role, "name": result[0]["name"], "username": result[0]["username"]}
             else:
                 print("Não encontrado!")
                 return False

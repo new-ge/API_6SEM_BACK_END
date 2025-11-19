@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from api_6sem_back_end.db.db_mongo_manipulate_data import monitorar_backup
-from api_6sem_back_end.routers import router_find_user, router_get_all_users, router_login, router_opened, router_average_time, router_by_period, router_predict_faq, router_simulate_login, router_exceeded_sla, router_recurring_tickets, router_primary_themes, router_sentiment, router_delete_users, router_update_user, router_create_user
+from api_6sem_back_end.routers import router_create_users, router_find_user, router_get_all_users, router_login, router_opened, router_average_time, router_by_period, router_predict_faq, router_simulate_login, router_exceeded_sla, router_recurring_tickets, router_primary_themes, router_sentiment, router_delete_users, router_update_user
 import os
 from dotenv import load_dotenv
 import os
@@ -47,7 +47,7 @@ app.include_router(router_login.router)
 app.include_router(router_find_user.router)
 app.include_router(router_update_user.router)
 app.include_router(router_delete_users.router)
-app.include_router(router_create_user.router)
+app.include_router(router_create_users.router)
 app.include_router(router_get_all_users.router)
 
 @app.get("/")
