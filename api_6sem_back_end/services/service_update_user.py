@@ -1,5 +1,5 @@
 from datetime import datetime, timezone, timedelta
-from api_6sem_back_end.repositories.update_repository import UpdateRepository
+from api_6sem_back_end.repositories.repository_update_user import UpdateRepository
 
 class UpdateService:
     @staticmethod

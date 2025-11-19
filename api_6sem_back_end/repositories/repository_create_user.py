@@ -2,7 +2,6 @@ from bson import ObjectId
 from datetime import datetime, timezone, timedelta
 from api_6sem_back_end.db.db_configuration import db_data
 
-
 def serialize_user(user):
     if not user:
         return None
@@ -11,7 +10,6 @@ def serialize_user(user):
 
 
 class UserRepository:
-
     @staticmethod
     def get_last_agent_id():
         last_user = db_data["users"].find_one(sort=[("agent_id", -1)])

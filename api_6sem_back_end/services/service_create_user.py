@@ -1,4 +1,4 @@
-from api_6sem_back_end.repositories.user_repository import UserRepository
+from api_6sem_back_end.repositories.repository_create_user import UserRepository
 
 
 class UserService:
