@@ -23,7 +23,10 @@ class UpdateRepository:
     
     @staticmethod
     def find_by_agent_id(agent_id: int):
-        return db_data["users"].find_one({"agent_id": agent_id})
+        return db_data["users"].find_one(
+            {"agent_id": agent_id},
+            {"name": 1}
+        )
     
     @staticmethod
     def find_by_name_or_email(identifier: str):

@@ -4,13 +4,7 @@ from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from api_6sem_back_end.db.db_mongo_manipulate_data import monitorar_backup
-from api_6sem_back_end.routers import router_create_users, router_find_user, router_get_all_users, router_login, router_opened, router_average_time, router_by_period, router_predict_faq, router_simulate_login, router_exceeded_sla, router_recurring_tickets, router_primary_themes, router_sentiment, router_delete_users, router_update_user
-import os
-from dotenv import load_dotenv
-import os
-
-dotenv_path = glob(os.path.join(os.path.dirname(__file__), "*.env"))
-load_dotenv(dotenv_path[0])
+from api_6sem_back_end.routers import router_create_users, router_find_user, router_get_all_logs, router_get_all_users, router_login, router_opened, router_average_time, router_by_period, router_predict_faq, router_exceeded_sla, router_recurring_tickets, router_primary_themes, router_sentiment, router_delete_users, router_update_user
 
 allow_origins = [
     "http://localhost:5173",
@@ -49,6 +43,7 @@ app.include_router(router_update_user.router)
 app.include_router(router_delete_users.router)
 app.include_router(router_create_users.router)
 app.include_router(router_get_all_users.router)
+app.include_router(router_get_all_logs.router)
 
 @app.get("/")
 async def root():

@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from api_6sem_back_end.repositories.repository_login_security import verify_token
 from api_6sem_back_end.services.service_create_user import UserService
+from api_6sem_back_end.utils.utils_logs import log_action
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.post("/create")
-def create_user(user: dict):
+@log_action("CREATE")
+def create_user(user: dict, payload=Depends(verify_token)):
     try:
         new_user = UserService.create_user(user)
         return {"message": "Usuário criado com sucesso!", "user": new_user}

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from api_6sem_back_end.db.db_mongo_manipulate_data import collection_users
 from api_6sem_back_end.repositories.repository_login_security import verify_token
 
-router = APIRouter(prefix="/user", tags=["User"])
+router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.get("/find")
 def find_user(
@@ -33,7 +33,7 @@ def find_user(
         return None
    
     return {
-        "name": user.get("name"),
+        "username": user.get("name"),
         "email": user.get("email"),
         "role": user.get("role")
     }

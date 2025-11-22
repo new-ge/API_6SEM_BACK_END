@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from api_6sem_back_end.db.db_configuration import db_data
 from api_6sem_back_end.repositories.repository_login_security import verify_token
 
-router = APIRouter(prefix="/get-all", tags=["Get all"])
+router = APIRouter(prefix="/users", tags=["Users"])
 collection = db_data["users"]
 
 @router.get("/get-all-users")
@@ -20,6 +20,6 @@ def get_all_users(payload=Depends(verify_token)):
                 "id": doc.get("agent_id"),
                 "name": name,
                 "email": email
-            })
+            })     
 
     return users
