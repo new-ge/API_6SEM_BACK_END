@@ -35,8 +35,8 @@ def set_consent(consent_data: dict, payload=Depends(verify_token)):
 class ConsentStatusResponse(BaseModel):
     consent: bool
 
-@router.get("/consent-status", response_model=ConsentStatusResponse, payload=Depends(verify_token))
-async def get_consent_status(agent_id: int):
+@router.get("/consent-status", response_model=ConsentStatusResponse)
+async def get_consent_status(agent_id: int, payload=Depends(verify_token)):
     user = collection.find_one({"agent_id": agent_id})
 
     if not user:
