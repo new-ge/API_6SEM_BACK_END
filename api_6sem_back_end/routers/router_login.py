@@ -28,6 +28,7 @@ def validate_login(login_request: LoginRequest):
             {
                 "$project": {
                     "_id": 0,
+                    "agent_id": "$agent_id",
                     "username": "$login.username",
                     "role": "$role",
                     "name": "$name",
@@ -39,7 +40,9 @@ def validate_login(login_request: LoginRequest):
         result = list(collection.aggregate(pipeline))
 
         if not result:
-            return False
+            return {
+                "success": False,
+            }
 
         user = result[0]
 
@@ -54,6 +57,7 @@ def validate_login(login_request: LoginRequest):
 
         return {
             "token": token,
+            "agent_id": user["agent_id"],
             "role": user["role"],
             "name": user["name"],
             "username": user["username"],

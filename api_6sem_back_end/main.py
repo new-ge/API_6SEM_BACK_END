@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from api_6sem_back_end.db.db_mongo_manipulate_data import monitorar_backup
-from api_6sem_back_end.routers import router_create_users, router_find_user, router_get_all_logs, router_get_all_users, router_login, router_opened, router_average_time, router_by_period, router_predict_faq, router_exceeded_sla, router_recurring_tickets, router_primary_themes, router_sentiment, router_delete_users, router_update_user
+from api_6sem_back_end.routers import router_consent_term, router_create_users, router_find_user, router_get_all_logs, router_get_all_users, router_login, router_opened, router_average_time, router_by_period, router_predict_faq, router_exceeded_sla, router_recurring_tickets, router_primary_themes, router_sentiment, router_delete_users, router_update_user
 
 allow_origins = [
     "http://localhost:5173",
@@ -44,6 +44,8 @@ app.include_router(router_delete_users.router)
 app.include_router(router_create_users.router)
 app.include_router(router_get_all_users.router)
 app.include_router(router_get_all_logs.router)
+app.include_router(router_consent_term.router)
+
 
 @app.get("/")
 async def root():

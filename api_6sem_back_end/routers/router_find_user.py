@@ -7,15 +7,12 @@ router = APIRouter(prefix="/users", tags=["Users"])
 @router.get("/find")
 def find_user(
     email: str = Query(None, description="E-mail do usuário"),
-    name: str = Query(None, description="Nome do usuário"),
     payload=Depends(verify_token)
 ):
     
     filtro = {}
     if email:
         filtro["email"] = email
-    elif name:
-        filtro["name"] = name
     else:
         return None  
 

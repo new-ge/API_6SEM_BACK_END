@@ -35,7 +35,6 @@ class UpdateService:
             timezone(timedelta(hours=-3))
         ).isoformat(timespec="seconds")
 
-        # Faz o update
         updated = UpdateRepository.update_user(agent_id, update_fields)
 
         if not updated:
