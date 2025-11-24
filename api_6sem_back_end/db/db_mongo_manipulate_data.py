@@ -6,6 +6,12 @@ from api_6sem_back_end.db.db_configuration import db_data, db_deleted, db_backup
 collection_deleted_users = db_deleted["deleted-users"]
 collection_users = db_data["users"]
 
+def find_users_by_ids(ids: list[int]):
+    return list(collection_users.find(
+        {"agent_id": {"$in": ids}},
+        {"_id": 0, "name": 1, "agent_id": 1}
+    ))
+
 def delete_users(agent_ids: list[int]):
     timestamp = datetime.now(timezone(timedelta(hours=-3))).isoformat(timespec='seconds')
 

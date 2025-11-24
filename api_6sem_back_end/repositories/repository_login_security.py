@@ -12,9 +12,9 @@ load_dotenv(dotenv_path[0])
 security = HTTPBearer()
 SECRET_KEY = os.getenv("KEY_JWT")
 
-def create_jwt_token(username, role):
+def create_jwt_token(name, role):
     payload = {
-        "username": username,
+        "name": name,
         "role": role,
         "iat": int(datetime.datetime.now().timestamp()),
         "exp": int((datetime.datetime.now() + datetime.timedelta(hours=1)).timestamp())

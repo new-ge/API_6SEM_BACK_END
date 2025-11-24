@@ -17,7 +17,8 @@ class UserService:
             },
             "name": data.get("name"),
             "role": data.get("role"),
-            "department": data.get("department", "-")
+            "department": data.get("department", "-"),
+            "consent": False
         }
 
         return UserRepository.create_user(user_data)
