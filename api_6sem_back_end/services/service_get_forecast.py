@@ -1,5 +1,5 @@
-from api_6sem_back_end.ml.train_tendency_line import train_model
-from api_6sem_back_end.utils.query_filter import Filtro
+from api_6sem_back_end.ml.ml_train_tendency_line import train_model
+from api_6sem_back_end.utils.utils_query_filter import Filtro
 
 def get_forecast(filtro: Filtro):
     model, df_grouped = train_model(filtro, train_until="2025-08-31")

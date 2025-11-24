@@ -1,38 +1,90 @@
+from datetime import datetime
 from fastapi import APIRouter
+from pydantic import BaseModel
 from api_6sem_back_end.db.db_configuration import db_data
-from api_6sem_back_end.repositories.repository_login_security import create_jwt_token, verify_token
+from api_6sem_back_end.repositories.repository_login_security import create_jwt_token
+from api_6sem_back_end.utils.utils_logs import save_log
 
 router = APIRouter(prefix="/login", tags=["Login"])
 collection = db_data["users"]
 
-@router.post("/validate-login")
-def validate_login(username, password):
-    try:
-        if username == "" and password == "":
-            return None
-        else:
-            pipeline = [
-                {
-                    "$match": {
-                        "login.username": username,
-                        "login.password": password
-                    }
-                },
-                {
-                    "$project": {
-                        "_id": 0,
-                        "username": {"$getField": {"field": "username", "input": "$login"}},
-                        "role": "$role"
-                    }
-                }
-            ]
-            result = list(collection.aggregate(pipeline))
-            if result:
-                token = create_jwt_token(result[0]["username"], result[0]["role"])
-                return token
-            else:
-                print("Não encontrado!")
-        
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
-    except:
-        raise Exception
+@router.post("/validate-login")
+def validate_login(login_request: LoginRequest):
+    try:
+        if not login_request.username or not login_request.password:
+            return None
+
+        pipeline = [
+            {
+                "$match": {
+                    "login.username": login_request.username,
+                    "login.password": login_request.password
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "agent_id": "$agent_id",
+                    "username": "$login.username",
+                    "role": "$role",
+                    "name": "$name",
+                    "firstaccess": "$firstaccess"
+                }
+            }
+        ]
+
+        result = list(collection.aggregate(pipeline))
+
+        if not result:
+            return {
+                "success": False,
+            }
+
+        user = result[0]
+
+        if user.get("firstaccess", False) is True:
+            return {
+                "firstaccess": True,
+                
+            }
+        
+        save_log("LOGIN", modified_by=result[0]["name"])
+        token = create_jwt_token(user["name"], user["role"])
+
+        return {
+            "token": token,
+            "agent_id": user["agent_id"],
+            "role": user["role"],
+            "name": user["name"],
+            "username": user["username"],
+            "firstaccess": False
+        }
+
+    except Exception as e:
+        raise Exception(f"Erro ao validar login: {str(e)}")
+
+
+class FirstAccessPayload(BaseModel):
+    new_password: str
+
+@router.put("/complete-first-access/{username}")
+def complete_first_access(username: str, payload: FirstAccessPayload):
+    result = collection.update_one(
+        {"login.username": username},
+        {
+            "$set": {
+                "firstaccess": False,
+                "login.password": payload.new_password,
+                "modified_at": datetime.now()
+            }
+        }
+    )
+
+    if result.modified_count == 0:
+        return {"success": False, "message": "Usuário não encontrado"}
+
+    return {"success": True}
